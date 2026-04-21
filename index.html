@@ -1,0 +1,3370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZiiCodex</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080810;
+  --surface: #0e0e1a;
+  --surface2: #13131f;
+  --border: #1e1e30;
+  --text: #e8e8ff;
+  --muted: #5a5a80;
+  --a: #00f5d4;   /* teal accent */
+  --b: #f5a623;   /* orange */
+  --c: #ff4d6d;   /* red-pink */
+  --d: #a855f7;   /* purple */
+  --e: #22d3ee;   /* cyan */
+  --f: #4ade80;   /* green */
+  --g: #facc15;   /* yellow */
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Rajdhani',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* BG */
+.bg-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,245,212,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,212,.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+.bg-glow{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 40% at 20% 20%, rgba(0,245,212,.07) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 35% at 80% 75%, rgba(168,85,247,.08) 0%,transparent 60%),
+    radial-gradient(ellipse 35% 30% at 75% 15%, rgba(245,166,35,.06) 0%,transparent 55%);
+  animation:glowPulse 8s ease-in-out infinite alternate;
+}
+@keyframes glowPulse{0%{opacity:.6}100%{opacity:1}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#1e1e30;border-radius:2px;}
+
+/* ── SPLASH / HEADER ── */
+#splash{
+  position:relative;z-index:10;
+  text-align:center;padding:60px 20px 0;
+}
+.logo-wrap{
+  display:inline-flex;align-items:center;gap:12px;
+  margin-bottom:6px;
+  animation:fadeDown .7s ease both;
+}
+.logo-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--a),var(--d));
+  display:grid;place-items:center;
+  font-size:1.3rem;
+  box-shadow:0 0 20px rgba(0,245,212,.3);
+}
+.logo-text{
+  font-family:'Orbitron',monospace;
+  font-size:1.9rem;font-weight:900;
+  letter-spacing:.08em;
+  background:linear-gradient(90deg,var(--a),var(--e),var(--d));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.tagline{
+  color:var(--muted);font-size:.85rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;
+  animation:fadeDown .7s .1s ease both;
+  margin-bottom:30px;
+}
+
+/* ── TAB NAV ── */
+#tabnav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,8,16,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  padding:0 12px;
+}
+#tabnav::-webkit-scrollbar{display:none;}
+.tab{
+  flex-shrink:0;display:flex;align-items:center;gap:7px;
+  padding:14px 18px;border:none;background:transparent;
+  color:var(--muted);font-family:'Rajdhani',sans-serif;
+  font-size:.88rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--tab-color,var(--a));border-bottom-color:var(--tab-color,var(--a));}
+.tab-icon{font-size:1rem;}
+
+/* ── MAIN ── */
+#app{
+  position:relative;z-index:5;
+  max-width:860px;margin:0 auto;
+  padding:28px 16px 80px;
+}
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── SECTION TITLE ── */
+.sec-title{
+  font-family:'Orbitron',monospace;
+  font-size:1rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sec-color,var(--a));
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.sec-title::before{
+  content:'';width:4px;height:20px;border-radius:2px;
+  background:var(--sec-color,var(--a));
+  box-shadow:0 0 8px var(--sec-color,var(--a));
+}
+
+/* ── CARDS GRID ── */
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.grid1{display:grid;grid-template-columns:1fr;gap:14px;max-width:560px;margin:0 auto;}
+
+/* ── PANEL ── */
+.panel{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:22px;
+  transition:border-color .2s,box-shadow .2s;
+  animation:fadeUp .4s ease both;
+}
+.panel:hover{
+  border-color:color-mix(in srgb,var(--panel-color,var(--a)) 30%,transparent);
+  box-shadow:0 8px 32px rgba(0,0,0,.3);
+}
+.panel-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.panel-icon{font-size:1.6rem;}
+.panel-title{
+  font-family:'Orbitron',monospace;font-size:.8rem;
+  font-weight:700;letter-spacing:.06em;
+  color:var(--panel-color,var(--a));
+}
+.panel-sub{font-size:.8rem;color:var(--muted);margin-top:2px;}
+
+/* ── INPUT ── */
+.inp{
+  width:100%;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:'DM Mono',monospace;
+  font-size:.82rem;padding:10px 14px;outline:none;
+  transition:border-color .2s;
+}
+.inp:focus{border-color:var(--panel-color,var(--a));}
+.inp::placeholder{color:#333355;}
+.inp-row{display:flex;gap:8px;margin-bottom:10px;}
+.inp-row .inp{flex:1;}
+
+/* ── BUTTON ── */
+.btn{
+  padding:10px 20px;border-radius:10px;border:none;
+  font-family:'Rajdhani',sans-serif;font-size:.88rem;
+  font-weight:700;letter-spacing:.06em;cursor:pointer;
+  transition:all .2s;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--panel-color,var(--a)),color-mix(in srgb,var(--panel-color,var(--a)) 60%,var(--d)));
+  color:#000;box-shadow:0 4px 16px color-mix(in srgb,var(--panel-color,var(--a)) 30%,transparent);
+}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-primary:active{transform:scale(.97);}
+.btn-primary.loading{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-ghost{
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 12%,transparent);
+  color:var(--panel-color,var(--a));
+  border:1px solid color-mix(in srgb,var(--panel-color,var(--a)) 25%,transparent);
+}
+.btn-ghost:hover{background:color-mix(in srgb,var(--panel-color,var(--a)) 22%,transparent);}
+.btn-sm{padding:7px 14px;font-size:.78rem;}
+.btn-full{width:100%;justify-content:center;}
+
+/* ── RESULT BOX ── */
+.result{
+  margin-top:12px;background:rgba(0,0,0,.4);
+  border:1px solid var(--border);border-radius:10px;
+  padding:14px;font-family:'DM Mono',monospace;
+  font-size:.75rem;color:#888;max-height:220px;
+  overflow-y:auto;white-space:pre-wrap;word-break:break-all;
+  line-height:1.6;display:none;animation:fadeUp .3s ease;
+}
+.result.show{display:block;}
+.result.ok{border-color:color-mix(in srgb,var(--f) 35%,transparent);color:var(--f);}
+.result.err{border-color:color-mix(in srgb,var(--c) 35%,transparent);color:var(--c);}
+.result.neutral{color:var(--text);}
+
+/* Download links */
+.dl-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.dl-link{
+  padding:8px 16px;border-radius:8px;text-decoration:none;
+  font-size:.8rem;font-weight:700;letter-spacing:.04em;
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 18%,transparent);
+  color:var(--panel-color,var(--a));
+  border:1px solid color-mix(in srgb,var(--panel-color,var(--a)) 25%,transparent);
+  transition:background .2s;
+}
+.dl-link:hover{background:color-mix(in srgb,var(--panel-color,var(--a)) 30%,transparent);}
+
+/* ── STALKER PROFILE CARD ── */
+.profile-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:20px;padding:28px;margin-top:14px;
+  animation:fadeUp .4s ease;display:none;
+}
+.profile-card.show{display:block;}
+.profile-top{display:flex;gap:18px;align-items:flex-start;margin-bottom:18px;}
+.profile-avatar{
+  width:72px;height:72px;border-radius:50%;
+  object-fit:cover;border:3px solid var(--panel-color,var(--a));
+  box-shadow:0 0 16px color-mix(in srgb,var(--panel-color,var(--a)) 30%,transparent);
+  flex-shrink:0;
+}
+.profile-avatar-placeholder{
+  width:72px;height:72px;border-radius:50%;
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 20%,transparent);
+  border:3px solid var(--panel-color,var(--a));
+  display:grid;place-items:center;font-size:2rem;flex-shrink:0;
+}
+.profile-name{
+  font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;
+}
+.profile-handle{color:var(--muted);font-size:.85rem;margin-top:2px;}
+.profile-bio{font-size:.85rem;color:#aaa;margin-top:6px;line-height:1.5;}
+.profile-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.pstat{
+  background:rgba(0,0,0,.3);border-radius:10px;
+  padding:12px;text-align:center;
+}
+.pstat-num{
+  font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+  color:var(--panel-color,var(--a));
+}
+.pstat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+
+/* ── AI CHAT ── */
+.chat-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+}
+.chat-header{
+  padding:14px 18px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.chat-model-dot{width:8px;height:8px;border-radius:50%;background:var(--f);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.chat-model-name{font-weight:700;font-size:.9rem;}
+.chat-msgs{
+  height:340px;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:.88rem;line-height:1.55;animation:fadeUp .3s ease;}
+.msg.user{
+  align-self:flex-end;
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 20%,transparent);
+  border:1px solid color-mix(in srgb,var(--panel-color,var(--a)) 30%,transparent);
+  color:var(--text);border-bottom-right-radius:4px;
+}
+.msg.bot{
+  align-self:flex-start;
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text);border-bottom-left-radius:4px;
+}
+.msg.typing{opacity:.6;}
+.chat-input-row{
+  padding:12px 14px;border-top:1px solid var(--border);
+  display:flex;gap:8px;background:var(--surface2);
+}
+.chat-input-row .inp{margin:0;}
+.chat-selector{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;
+}
+.model-chip{
+  padding:7px 14px;border-radius:999px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);
+  font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .2s;letter-spacing:.04em;
+}
+.model-chip.active{
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 20%,transparent);
+  color:var(--panel-color,var(--a));
+  border-color:color-mix(in srgb,var(--panel-color,var(--a)) 40%,transparent);
+}
+
+/* ── GAME ── */
+.game-container{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  animation:fadeUp .4s ease;
+}
+.game-topbar{
+  padding:14px 18px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.game-name{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--panel-color,var(--a));}
+.game-score-wrap{display:flex;gap:16px;}
+.game-stat{text-align:center;}
+.game-stat-num{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--panel-color,var(--a));}
+.game-stat-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.game-body{padding:22px;}
+.game-question{
+  background:rgba(0,0,0,.35);border:1px solid var(--border);
+  border-radius:12px;padding:18px;
+  font-size:1rem;font-weight:600;line-height:1.6;
+  color:var(--text);margin-bottom:16px;min-height:70px;
+  display:flex;align-items:center;
+}
+.game-hint-area{
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--panel-color,var(--a)) 22%,transparent);
+  border-radius:12px;padding:14px 18px;margin-bottom:14px;
+}
+.hint-label{
+  font-size:.65rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--panel-color,var(--a));margin-bottom:8px;
+}
+.hint-text{
+  font-family:'DM Mono',monospace;font-size:1.3rem;
+  font-weight:500;color:var(--panel-color,var(--a));
+  letter-spacing:.22em;word-break:break-all;
+}
+.game-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.game-btns .btn{flex:1;min-width:90px;justify-content:center;}
+.game-answer-reveal{
+  background:color-mix(in srgb,var(--f) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--f) 30%,transparent);
+  border-radius:10px;padding:14px;text-align:center;
+  font-size:.95rem;font-weight:700;color:var(--f);
+  display:none;animation:fadeUp .3s ease;
+}
+.game-answer-reveal.show{display:block;}
+.game-start{padding:40px 20px;text-align:center;}
+.game-start h3{font-family:'Orbitron',monospace;font-size:1.1rem;margin-bottom:8px;color:var(--panel-color,var(--a));}
+.game-start p{color:var(--muted);font-size:.9rem;margin-bottom:20px;}
+
+/* GAME SELECTOR GRID */
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;margin-bottom:20px;
+}
+.game-tile{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:18px 14px;
+  text-align:center;cursor:pointer;
+  transition:all .2s;animation:fadeUp .4s ease both;
+}
+.game-tile:hover{
+  border-color:var(--panel-color,var(--a));
+  transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.game-tile.selected{
+  background:color-mix(in srgb,var(--panel-color,var(--a)) 15%,transparent);
+  border-color:var(--panel-color,var(--a));
+}
+.game-tile-icon{font-size:2rem;margin-bottom:8px;}
+.game-tile-name{font-size:.78rem;font-weight:700;letter-spacing:.04em;color:var(--text);}
+
+/* ── TOOLS ── */
+.tool-result-img{
+  max-width:100%;border-radius:10px;margin-top:12px;
+  display:none;animation:fadeUp .3s ease;
+}
+.tool-result-img.show{display:block;}
+.color-swatch{
+  width:100%;height:80px;border-radius:12px;margin-top:12px;
+  display:none;animation:fadeUp .3s ease;border:1px solid var(--border);
+}
+.color-swatch.show{display:block;}
+
+/* ── INFO / STATS ── */
+.stat-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:10px;margin-top:12px;
+}
+.stat-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;
+  animation:fadeUp .3s ease;
+}
+.stat-item-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.stat-item-val{font-family:'DM Mono',monospace;font-size:.92rem;color:var(--text);font-weight:500;}
+
+/* ── DOWNLOAD ── */
+.dl-result{
+  margin-top:14px;display:none;animation:fadeUp .4s ease;
+}
+.dl-result.show{display:flex;flex-direction:column;gap:10px;}
+.dl-media-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.dl-media-info{flex:1;}
+.dl-media-title{font-weight:700;font-size:.88rem;margin-bottom:3px;}
+.dl-media-meta{font-size:.75rem;color:var(--muted);}
+
+/* ── ANIMS ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+
+/* ── AI CHAT NEW ── */
+.ai-msg-user, .ai-msg-bot {
+  display:flex;gap:10px;align-items:flex-start;animation:fadeUp .3s ease;
+}
+.ai-msg-user { flex-direction:row-reverse; }
+.ai-avatar-bot {
+  width:32px;height:32px;border-radius:10px;
+  background:color-mix(in srgb,var(--d) 20%,transparent);
+  border:1px solid color-mix(in srgb,var(--d) 30%,transparent);
+  display:grid;place-items:center;font-size:1rem;flex-shrink:0;
+}
+.ai-avatar-user {
+  width:32px;height:32px;border-radius:10px;
+  background:color-mix(in srgb,var(--a) 20%,transparent);
+  border:1px solid color-mix(in srgb,var(--a) 30%,transparent);
+  display:grid;place-items:center;font-size:.75rem;font-weight:700;
+  color:var(--a);flex-shrink:0;letter-spacing:.04em;
+}
+.ai-bubble-bot {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px 14px 14px 4px;
+  padding:11px 14px;font-size:.88rem;line-height:1.6;
+  color:var(--text);max-width:85%;word-break:break-word;
+}
+.ai-bubble-user {
+  background:color-mix(in srgb,var(--d) 18%,transparent);
+  border:1px solid color-mix(in srgb,var(--d) 28%,transparent);
+  border-radius:14px 14px 4px 14px;
+  padding:11px 14px;font-size:.88rem;line-height:1.6;
+  color:var(--text);max-width:85%;word-break:break-word;
+}
+/* markdown inside AI bubble */
+.ai-bubble-bot p { margin:0 0 10px; }
+.ai-bubble-bot p:last-child { margin-bottom:0; }
+.ai-bubble-bot h1,.ai-bubble-bot h2,.ai-bubble-bot h3 { color:#fff;margin:14px 0 6px;font-size:1em; }
+.ai-bubble-bot ul,.ai-bubble-bot ol { margin:6px 0;padding-left:18px; }
+.ai-bubble-bot li { margin-bottom:3px; }
+.ai-bubble-bot strong { color:#fff;font-weight:700; }
+.ai-bubble-bot a { color:var(--a);text-decoration:none;word-break:break-all; }
+.ai-bubble-bot code:not(pre code) {
+  background:rgba(255,255,255,.1);padding:2px 5px;
+  border-radius:4px;font-family:'DM Mono',monospace;font-size:.82em;
+}
+.ai-bubble-bot pre {
+  background:#0d0d0d;border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:12px;overflow-x:auto;margin:10px 0;
+}
+.ai-bubble-bot pre code { font-family:'DM Mono',monospace;font-size:.78em;color:#e4e4e7; }
+.ai-bubble-bot blockquote {
+  border-left:3px solid var(--border);margin:8px 0;
+  padding-left:12px;color:var(--muted);font-style:italic;
+}
+/* ── MULTIPLAYER ── */
+:root { --orange: #f97316; }
+.mp-screen { display:none; }
+.mp-screen.active { display:block; }
+.mp-lobby-title {
+  font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:900;
+  color:var(--orange); text-align:center; margin-bottom:6px; letter-spacing:.06em;
+}
+.mp-lobby-sub { text-align:center; color:var(--muted); font-size:.8rem; margin-bottom:20px; }
+.mp-inp-label { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); margin-bottom:5px; }
+.mp-room-code {
+  font-family:'Orbitron',monospace; font-size:2.4rem; font-weight:900;
+  color:var(--orange); text-align:center; letter-spacing:.25em;
+  background:rgba(249,115,22,.08); border:2px solid rgba(249,115,22,.3);
+  border-radius:14px; padding:16px; margin:14px 0;
+}
+.mp-player-card {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; padding:12px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:8px; animation:fadeUp .3s ease;
+}
+.mp-player-name { font-weight:700; font-size:.92rem; }
+.mp-player-score { font-family:'Orbitron',monospace; font-size:1rem; font-weight:700; color:var(--orange); }
+.mp-player-badge { font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border-radius:999px; }
+.mp-badge-host { background:rgba(249,115,22,.15); color:var(--orange); border:1px solid rgba(249,115,22,.3); }
+.mp-badge-ready { background:rgba(74,222,128,.15); color:var(--f); border:1px solid rgba(74,222,128,.3); }
+.mp-badge-you { background:rgba(0,245,212,.15); color:var(--a); border:1px solid rgba(0,245,212,.3); }
+.mp-timer-ring {
+  width:72px; height:72px; border-radius:50%;
+  background:conic-gradient(var(--orange) var(--pct,100%), rgba(255,255,255,.07) 0);
+  display:grid; place-items:center; flex-shrink:0;
+  transition:background .5s;
+}
+.mp-timer-inner {
+  width:58px; height:58px; border-radius:50%; background:var(--surface);
+  display:grid; place-items:center;
+  font-family:'Orbitron',monospace; font-size:1.15rem; font-weight:900; color:var(--orange);
+}
+.mp-topbar {
+  padding:14px 18px; background:var(--surface2); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.mp-scores-row {
+  display:flex; gap:8px; overflow-x:auto; padding:0 2px; margin-bottom:14px;
+  scrollbar-width:none;
+}
+.mp-scores-row::-webkit-scrollbar{display:none;}
+.mp-score-chip {
+  flex-shrink:0; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:8px 12px; text-align:center; min-width:80px;
+}
+.mp-score-chip.me { border-color:rgba(249,115,22,.4); background:rgba(249,115,22,.07); }
+.mp-score-chip-name { font-size:.68rem; font-weight:700; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80px; }
+.mp-score-chip-val { font-family:'Orbitron',monospace; font-size:.95rem; font-weight:700; color:var(--orange); }
+.mp-answered-badge {
+  display:inline-block; padding:2px 8px; border-radius:6px;
+  font-size:.65rem; font-weight:700; letter-spacing:.08em;
+  background:rgba(74,222,128,.15); color:var(--f); border:1px solid rgba(74,222,128,.3);
+  margin-left:6px; vertical-align:middle;
+}
+.mp-result-podium { display:flex; align-items:flex-end; justify-content:center; gap:8px; margin:20px 0; }
+.mp-podium-col { display:flex; flex-direction:column; align-items:center; }
+.mp-podium-bar { width:64px; border-radius:8px 8px 0 0; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+.mp-podium-name { font-size:.72rem; font-weight:700; margin-top:5px; text-align:center; max-width:70px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-podium-score { font-family:'Orbitron',monospace; font-size:.8rem; color:var(--orange); }
+
+/* ── GALERI ── */
+/* Tab ini menampilkan gambar random dari file JSON di folder api/picture/
+   File JSON berisi array object {url:"..."} atau array string URL
+   Tersedia pic1.json sampai pic26.json — ganti nama sesuai kebutuhan */
+:root { --pink: #ec4899; }
+.gal-img-wrap {
+  position:relative; border-radius:16px; overflow:hidden;
+  background:var(--surface2); border:1px solid var(--border);
+  min-height:300px; display:flex; align-items:center; justify-content:center;
+  animation:fadeUp .4s ease;
+}
+.gal-img-wrap img {
+  width:100%; max-height:70vh; object-fit:contain; display:block;
+  border-radius:16px;
+}
+.gal-img-placeholder {
+  text-align:center; padding:60px 20px; color:var(--muted);
+}
+.gal-img-placeholder div:first-child { font-size:3rem; margin-bottom:10px; }
+.gal-btn-row { display:flex; gap:8px; }
+.gal-btn-row .btn { flex:1; justify-content:center; }
+.gal-select-styled {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; color:var(--text);
+  font-family:'Rajdhani',sans-serif; font-size:.95rem; font-weight:600;
+  outline:none; appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ec4899'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 14px center;
+  cursor:pointer;
+}
+.gal-info-bar {
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:.75rem; color:var(--muted); padding:2px 0;
+}
+.gal-counter {
+  font-family:'DM Mono',monospace; font-size:.8rem;
+  color:var(--pink); font-weight:700;
+}
+.gal-loading-spinner {
+  width:40px; height:40px; border-radius:50%;
+  border:3px solid var(--border); border-top-color:var(--pink);
+  animation:galSpin .7s linear infinite; margin:0 auto;
+}
+@keyframes galSpin { to { transform:rotate(360deg); } }
+
+  .profile-stats{grid-template-columns:repeat(2,1fr);}
+  .grid2{grid-template-columns:1fr;}
+  .logo-text{font-size:1.5rem;}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div id="splash">
+  <div class="logo-wrap">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">ZiiCodex</div>
+  </div>
+  <div class="tagline">Tools · Games · AI · All in One</div>
+</div>
+
+<!-- TAB NAV -->
+<nav id="tabnav">
+  <button class="tab active" data-view="games"    style="--tab-color:var(--a)">  <span class="tab-icon">🎮</span> Games</button>
+  <button class="tab"        data-view="ai"       style="--tab-color:var(--d)">  <span class="tab-icon">🤖</span> AI Chat</button>
+  <button class="tab"        data-view="downloader" style="--tab-color:var(--b)"><span class="tab-icon">⬇️</span> Downloader</button>
+  <button class="tab"        data-view="stalker"  style="--tab-color:var(--c)">  <span class="tab-icon">🔍</span> Stalker</button>
+  <button class="tab"        data-view="tools"    style="--tab-color:var(--f)">  <span class="tab-icon">🛠️</span> Tools</button>
+  <button class="tab"        data-view="info"     style="--tab-color:var(--g)">  <span class="tab-icon">🌍</span> Info</button>
+  <button class="tab"        data-view="tempmail" style="--tab-color:var(--e)">  <span class="tab-icon">📧</span> TempMail</button>
+  <button class="tab"        data-view="multi"    style="--tab-color:#f97316">  <span class="tab-icon">⚔️</span> VS Mode</button>
+  <button class="tab"        data-view="gallery"  style="--tab-color:#ec4899">  <span class="tab-icon">🖼️</span> Galeri</button>
+</nav>
+
+<div id="app">
+
+<!-- ════════════════════════════════ GAMES ════════════════════════════════ -->
+<div class="view active" id="view-games" style="--panel-color:var(--a)">
+  <div class="sec-title" style="--sec-color:var(--a)">🎮 Mini Games</div>
+
+  <!-- Game selector -->
+  <div id="game-selector">
+    <div class="game-grid" id="game-grid"></div>
+  </div>
+
+  <!-- Game play area -->
+  <div id="game-play" style="display:none">
+    <button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="backToGameSelect()">← Pilih Game Lain</button>
+    <div class="game-container" style="--panel-color:var(--a)">
+      <div class="game-topbar">
+        <div class="game-name" id="gname">-</div>
+        <div class="game-score-wrap">
+          <div class="game-stat">
+            <div class="game-stat-num" id="gscore">0</div>
+            <div class="game-stat-label">Score</div>
+          </div>
+          <div class="game-stat">
+            <div class="game-stat-num" id="gstreak">0</div>
+            <div class="game-stat-label">Streak</div>
+          </div>
+        </div>
+      </div>
+      <div class="game-body">
+        <div class="game-start" id="game-start">
+          <div style="font-size:3rem;margin-bottom:14px" id="gstart-icon">🎯</div>
+          <h3 id="gstart-title">Siap Bermain?</h3>
+          <p id="gstart-desc">Jawab sebanyak mungkin soal dan raih skor tertinggi!</p>
+          <button class="btn btn-primary btn-full" onclick="startGame()">▶ Mulai Game</button>
+        </div>
+        <div id="game-playing" style="display:none">
+          <!-- gambar (tipe bendera/imgqa/imgonly) -->
+          <div id="gimg-wrap" style="display:none;margin-bottom:14px;text-align:center">
+            <img id="gimg" style="max-width:100%;max-height:220px;border-radius:12px;border:1px solid var(--border);object-fit:contain">
+          </div>
+
+          <div class="game-question" id="gquestion">Memuat soal...</div>
+
+          <!-- family100: list jawaban -->
+          <div id="gf100-wrap" style="display:none;margin-bottom:14px">
+            <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:8px">💯 JAWABAN BENAR</div>
+            <div id="gf100-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          </div>
+
+          <!-- no-answer notice (bucin/dare/truth/imgonly) -->
+          <div id="gnoans-msg" style="display:none;text-align:center;padding:8px 0 4px;font-size:.8rem;color:var(--muted)">✨ Tap <b style="color:var(--a)">Nyerah</b> untuk lanjut</div>
+
+          <!-- hint area -->
+          <div class="game-hint-area" id="ghint-area">
+            <div class="hint-label">💡 Hint Jawaban</div>
+            <div class="hint-text" id="ghint">_ _ _ _</div>
+          </div>
+
+          <!-- answer input -->
+          <div id="gins-row" style="display:flex;gap:8px;margin-bottom:10px">
+            <input class="inp" id="gins-inp" placeholder="Ketik jawaban kamu..."
+              onkeydown="if(event.key==='Enter')checkAnswer()">
+            <button class="btn btn-primary btn-sm" onclick="checkAnswer()">✔ Jawab</button>
+          </div>
+
+          <!-- feedback -->
+          <div id="gfeedback" style="display:none;border-radius:10px;padding:11px 16px;margin-bottom:10px;font-weight:700;font-size:.88rem;text-align:center;animation:fadeUp .3s ease"></div>
+
+          <div class="game-btns">
+            <button class="btn btn-ghost btn-sm" id="ghint-btn" onclick="addHint()">👁 LIHAT (<span id="ghint-count">4</span>x)</button>
+            <button class="btn btn-primary btn-sm" id="gnyerah-btn" onclick="nyerah()" style="--panel-color:var(--c);background:rgba(255,77,109,.15);border-color:var(--c);color:var(--c)">🏳 NYERAH (-5)</button>
+          </div>
+          <div class="game-answer-reveal" id="greveal"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ AI CHAT ════════════════════════════════ -->
+<div class="view" id="view-ai" style="--panel-color:var(--d)">
+  <div class="sec-title" style="--sec-color:var(--d)">🤖 AI Chat</div>
+
+  <!-- Model chips -->
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="ai-model-chips"></div>
+
+  <!-- Chat container -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;height:520px;max-height:70vh;">
+
+    <!-- Header -->
+    <div style="padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--f);animation:blink 1.5s infinite;flex-shrink:0"></div>
+      <div style="font-weight:700;font-size:.9rem" id="ai-model-name">ZiiCodex AI</div>
+      <button onclick="clearAiChat()" style="margin-left:auto;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.72rem;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.04em;transition:all .2s" onmouseover="this.style.borderColor='var(--c)';this.style.color='var(--c)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🗑 Clear</button>
+    </div>
+
+    <!-- Messages -->
+    <div id="ai-msgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+      <div class="ai-msg-bot">
+        <div class="ai-avatar-bot">🤖</div>
+        <div class="ai-bubble-bot">Halo! Aku ZiiCodex AI — tanyain apa aja, aku jawab! 👋</div>
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div id="ai-typing" style="display:none;padding:0 16px 10px;flex-shrink:0">
+      <div style="display:flex;gap:5px;align-items:center">
+        <div style="width:7px;height:7px;border-radius:50%;background:#a1a1aa;animation:pulseGlow 1.4s infinite ease-in-out both;animation-delay:-0.32s"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#a1a1aa;animation:pulseGlow 1.4s infinite ease-in-out both;animation-delay:-0.16s"></div>
+        <div style="width:7px;height:7px;border-radius:50%;background:#a1a1aa;animation:pulseGlow 1.4s infinite ease-in-out both"></div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:12px;border-top:1px solid var(--border);background:var(--surface2);display:flex;gap:8px;flex-shrink:0">
+      <input class="inp" id="ai-inp" placeholder="Tanyakan apa saja..."
+        style="flex:1;--panel-color:var(--d)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiChat()}">
+      <button class="btn btn-primary btn-sm" style="--panel-color:var(--d);flex-shrink:0" onclick="sendAiChat()" id="ai-send-btn">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ DOWNLOADER ════════════════════════════════ -->
+<div class="view" id="view-downloader" style="--panel-color:var(--b)">
+  <div class="sec-title" style="--sec-color:var(--b)">⬇️ Downloader</div>
+  <div class="grid2" id="dl-grid"></div>
+</div>
+
+<!-- ════════════════════════════════ STALKER ════════════════════════════════ -->
+<div class="view" id="view-stalker" style="--panel-color:var(--c)">
+  <div class="sec-title" style="--sec-color:var(--c)">🔍 Social Stalker</div>
+  <div class="grid2" id="stalk-grid"></div>
+</div>
+
+<!-- ════════════════════════════════ TOOLS ════════════════════════════════ -->
+<div class="view" id="view-tools" style="--panel-color:var(--f)">
+  <div class="sec-title" style="--sec-color:var(--f)">🛠️ Tools</div>
+  <div class="grid2" id="tools-grid"></div>
+</div>
+
+<!-- ════════════════════════════════ INFO ════════════════════════════════ -->
+<div class="view" id="view-info" style="--panel-color:var(--g)">
+  <div class="sec-title" style="--sec-color:var(--g)">🌍 Info & Data</div>
+  <div class="grid2" id="info-grid"></div>
+</div>
+
+<!-- ════════════ TEMP MAIL ════════════ -->
+<div class="view" id="view-tempmail" style="--panel-color:var(--e)">
+  <div class="sec-title" style="--sec-color:var(--e)">📧 Temp Mail</div>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <!-- Status -->
+    <div style="display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted);letter-spacing:.08em;padding:0 2px">
+      <div id="tm-dot" style="width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;box-shadow:0 0 6px var(--muted);transition:all .3s"></div>
+      <span id="tm-status">Menghubungkan ke server...</span>
+    </div>
+
+    <!-- Email Card -->
+    <div class="panel" style="--panel-color:var(--e)">
+      <div style="font-size:.68rem;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;text-transform:uppercase">📬 Alamat Email Sementara</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div id="tm-email" style="flex:1;font-family:'DM Mono',monospace;font-size:.85rem;color:var(--e);word-break:break-all;">GENERATING...</div>
+        <button onclick="tmCopyEmail()" id="tm-copy-btn" style="flex-shrink:0;background:var(--e);color:var(--bg);border:none;border-radius:8px;padding:8px 14px;font-size:.75rem;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:opacity .2s">COPY</button>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="panel" style="--panel-color:var(--e);display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:1.5rem">⏱</span>
+        <div>
+          <div style="font-size:.65rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:2px">Berakhir Dalam</div>
+          <div id="tm-timer" style="font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--e);font-weight:700;line-height:1">10:00</div>
+        </div>
+      </div>
+      <button onclick="tmExtend()" style="background:transparent;border:1px solid var(--e);color:var(--e);border-radius:8px;padding:8px 16px;font-size:.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;letter-spacing:.05em;transition:all .2s">⚡ +10 MIN</button>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button onclick="tmChange()" id="tm-change-btn" class="btn btn-primary" style="--panel-color:var(--e)">🔄 GANTI MAIL</button>
+      <button onclick="tmDelete()" id="tm-delete-btn" class="btn btn-primary" style="--panel-color:var(--c)">🗑️ HAPUS MAIL</button>
+    </div>
+
+    <!-- Inbox -->
+    <div class="panel" style="--panel-color:var(--e);padding:0;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;">
+        <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;letter-spacing:.08em;">
+          📥 INBOX
+          <span id="tm-count" style="background:var(--e);color:var(--bg);border-radius:20px;padding:1px 8px;font-size:.72rem;font-family:'DM Mono',monospace">0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:.65rem;color:var(--e);letter-spacing:.08em;opacity:.8">AUTO ●</span>
+          <button onclick="tmRefresh()" id="tm-refresh-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:1rem;line-height:1;transition:transform .3s">↻</button>
+        </div>
+      </div>
+      <div id="tm-inbox" style="padding:0 12px 12px;">
+        <div style="text-align:center;padding:28px 0;color:var(--muted);">
+          <div style="font-size:2.2rem;margin-bottom:8px">📭</div>
+          <div style="font-size:.85rem;font-weight:700;letter-spacing:.08em">INBOX KOSONG</div>
+          <div style="font-size:.75rem;margin-top:4px;opacity:.7">Menunggu email masuk...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- ════════════════════════════════ MULTIPLAYER ════════════════════════════════ -->
+<div class="view" id="view-multi" style="--panel-color:var(--orange,#f97316)">
+  <div class="sec-title" style="--sec-color:#f97316">⚔️ VS Mode · Multiplayer</div>
+
+  <!-- SCREEN 1: LOBBY UTAMA -->
+  <div class="mp-screen active" id="mp-home">
+    <div class="mp-lobby-title">⚡ PERANG KUIS</div>
+    <div class="mp-lobby-sub">Tantang teman, siapa cepat dia menang!</div>
+    <div class="panel" style="--panel-color:#f97316">
+      <div class="mp-inp-label">Nama Kamu</div>
+      <input class="inp" id="mp-myname" placeholder="Masukkan nama..." maxlength="20" style="margin-bottom:16px">
+      <button class="btn btn-primary btn-full" style="--panel-color:#f97316;margin-bottom:10px" onclick="mpCreateRoom()">🏠 Buat Room Baru</button>
+      <div style="text-align:center;color:var(--muted);font-size:.8rem;margin:6px 0">— atau —</div>
+      <div class="mp-inp-label" style="margin-top:10px">Kode Room</div>
+      <div style="display:flex;gap:8px">
+        <input class="inp" id="mp-joincode" placeholder="Contoh: ABC123" maxlength="6" style="text-transform:uppercase;font-family:'Orbitron',monospace;letter-spacing:.12em;flex:1">
+        <button class="btn btn-primary btn-sm" style="--panel-color:#f97316" onclick="mpJoinRoom()">Masuk</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: LOBBY ROOM (pilih game, tunggu player) -->
+  <div class="mp-screen" id="mp-lobby">
+    <button class="btn btn-ghost btn-sm" style="margin-bottom:14px" onclick="mpLeaveRoom()">← Keluar Room</button>
+    <div class="panel" style="--panel-color:#f97316;padding:0;overflow:hidden">
+      <div class="mp-topbar">
+        <div>
+          <div style="font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px">Kode Room</div>
+          <div class="mp-room-code" style="font-size:1.3rem;padding:6px 14px;margin:0" id="mp-show-code">------</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Status</div>
+          <div id="mp-lobby-status" style="font-size:.8rem;font-weight:700;color:var(--f)">Menunggu pemain...</div>
+        </div>
+      </div>
+      <div style="padding:16px">
+        <!-- Pilih game -->
+        <div id="mp-game-pick-wrap">
+          <div class="mp-inp-label">Pilih Game</div>
+          <select class="inp" id="mp-game-sel" style="margin-bottom:12px"></select>
+          <div class="mp-inp-label">Jumlah Soal</div>
+          <select class="inp" id="mp-rounds-sel" style="margin-bottom:16px">
+            <option value="5">5 Soal</option>
+            <option value="10" selected>10 Soal</option>
+            <option value="15">15 Soal</option>
+            <option value="20">20 Soal</option>
+          </select>
+          <div id="mp-host-btn-wrap">
+            <button class="btn btn-primary btn-full" style="--panel-color:#f97316" onclick="mpStartGame()">▶ Mulai Game!</button>
+          </div>
+          <div id="mp-guest-wait" style="display:none;text-align:center;color:var(--muted);font-size:.85rem;padding:10px 0">
+            ⏳ Menunggu host memulai game...
+          </div>
+        </div>
+        <!-- Daftar pemain -->
+        <div class="mp-inp-label" style="margin-top:14px">Pemain (<span id="mp-player-count">0</span>)</div>
+        <div id="mp-player-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: MAIN GAME -->
+  <div class="mp-screen" id="mp-playing">
+    <div class="game-container" style="--panel-color:#f97316">
+      <div class="mp-topbar">
+        <div style="flex:1">
+          <div style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase" id="mp-game-label">Game</div>
+          <div style="font-weight:700;font-size:.88rem;color:#f97316" id="mp-round-label">Soal 1/10</div>
+        </div>
+        <!-- Timer ring -->
+        <div class="mp-timer-ring" id="mp-timer-ring">
+          <div class="mp-timer-inner" id="mp-timer-num">60</div>
+        </div>
+      </div>
+      <!-- Score chips semua pemain -->
+      <div style="padding:10px 14px 0">
+        <div class="mp-scores-row" id="mp-scores-row"></div>
+      </div>
+      <div class="game-body" style="padding-top:10px">
+        <!-- gambar -->
+        <div id="mp-img-wrap" style="display:none;margin-bottom:14px;text-align:center">
+          <img id="mp-img" style="max-width:100%;max-height:200px;border-radius:12px;border:1px solid var(--border);object-fit:contain">
+        </div>
+        <div class="game-question" id="mp-question">Memuat soal...</div>
+        <!-- hint -->
+        <div class="game-hint-area" id="mp-hint-area" style="--panel-color:#f97316">
+          <div class="hint-label">💡 Petunjuk</div>
+          <div class="hint-text" id="mp-hint" style="color:#f97316">_ _ _ _</div>
+        </div>
+        <!-- feedback -->
+        <div id="mp-feedback" style="display:none;border-radius:10px;padding:11px 16px;margin-bottom:10px;font-weight:700;font-size:.88rem;text-align:center;animation:fadeUp .3s ease"></div>
+        <!-- input -->
+        <div id="mp-ins-row" style="display:flex;gap:8px;margin-bottom:10px">
+          <input class="inp" id="mp-inp" placeholder="Ketik jawaban..." onkeydown="if(event.key==='Enter')mpCheckAnswer()">
+          <button class="btn btn-primary btn-sm" style="--panel-color:#f97316" onclick="mpCheckAnswer()">✔ Jawab</button>
+        </div>
+        <!-- tombol -->
+        <div class="game-btns">
+          <button class="btn btn-ghost btn-sm" id="mp-hint-btn" onclick="mpAddHint()">👁 LIHAT (<span id="mp-hint-count">4</span>x) <span id="mp-hint-penalty" style="font-size:.65rem;opacity:.7">-2 skor</span></button>
+          <button class="btn btn-sm" id="mp-nyerah-btn" style="background:rgba(100,100,120,.15);border:1px solid var(--border);color:var(--muted)" onclick="mpVoteNyerah()">🏳 Nyerah <span id="mp-nyerah-count" style="font-size:.7rem">(0/0)</span></button>
+        </div>
+        <!-- who answered / vote info -->
+        <div id="mp-answered-list" style="margin-top:8px;font-size:.75rem;color:var(--muted);min-height:20px"></div>
+        <div id="mp-vote-info" style="display:none;margin-top:6px;font-size:.72rem;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);border-radius:8px;padding:8px 12px;color:#f97316;text-align:center"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: HASIL AKHIR -->
+  <div class="mp-screen" id="mp-result">
+    <div class="panel" style="--panel-color:#f97316;text-align:center">
+      <div style="font-size:2rem;margin-bottom:6px">🏆</div>
+      <div class="mp-lobby-title">HASIL AKHIR</div>
+      <div class="mp-result-podium" id="mp-podium"></div>
+      <div id="mp-final-list" style="margin-bottom:18px"></div>
+      <button class="btn btn-primary btn-full" style="--panel-color:#f97316;margin-bottom:8px" onclick="mpPlayAgain()">🔄 Main Lagi</button>
+      <button class="btn btn-ghost btn-sm btn-full" onclick="mpLeaveRoom()">← Keluar Room</button>
+    </div>
+  </div>
+</div>
+
+<!-- TempMail Email Detail Modal -->
+<div id="tm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)tmCloseModal()">
+  <div style="background:var(--surface2);border:1px solid var(--border);border-top:2px solid var(--e);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;padding:20px;position:relative;">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;"></div>
+    <button onclick="tmCloseModal()" style="position:absolute;top:16px;right:16px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1rem;line-height:1">✕</button>
+    <div id="tm-modal-subject" style="font-size:1rem;font-weight:700;color:var(--e);margin-bottom:6px;padding-right:44px;"></div>
+    <div id="tm-modal-from" style="font-size:.75rem;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:3px;"></div>
+    <div id="tm-modal-date" style="font-size:.72rem;color:var(--muted);margin-bottom:14px;"></div>
+    <div id="tm-otp-box" style="display:none;background:rgba(34,211,238,.08);border:1px solid var(--e);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:.65rem;letter-spacing:.1em;color:var(--e);margin-bottom:8px;text-transform:uppercase">🔑 OTP / Kode Verifikasi Terdeteksi</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="tm-otp-code" style="font-family:'DM Mono',monospace;font-size:2.2rem;color:var(--e);letter-spacing:.2em;flex:1;"></div>
+        <button onclick="tmCopyOTP()" id="tm-otp-copy" style="background:var(--e);color:var(--bg);border:none;border-radius:8px;padding:8px 16px;font-size:.8rem;font-family:'Rajdhani',sans-serif;font-weight:700;cursor:pointer;">COPY</button>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--border);margin-bottom:14px;"></div>
+    <div id="tm-modal-body" style="font-size:.82rem;color:var(--text);white-space:pre-wrap;word-break:break-word;line-height:1.7;font-family:'DM Mono',monospace;opacity:.85;"></div>
+  </div>
+</div>
+
+<script>
+
+
+// ═══════════════════════════════════════
+//  TAB NAVIGATION
+// ═══════════════════════════════════════
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('view-'+t.dataset.view).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════
+//  HELPER
+// ═══════════════════════════════════════
+async function apiFetch(url, params={}) {
+  // url bisa full URL atau path — kalau path, dibuang (legacy support)
+  if (!url.startsWith('http')) url = 'https://api.siputzx.my.id' + url;
+  const u = new URLSearchParams(params);
+  const fullUrl = url + (Object.keys(params).length ? '?' + u : '');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const res = await fetch(fullUrl, { signal: controller.signal });
+    clearTimeout(timer);
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('image')) {
+      const blob = await res.blob();
+      return { _isImage: true, url: URL.createObjectURL(blob) };
+    }
+    return await res.json();
+  } catch(e) {
+    clearTimeout(timer);
+    throw new Error(e.name === 'AbortError' ? 'Request timeout' : e.message);
+  }
+}
+
+function findUrls(o, f=[], d=0) {
+  if(d>6) return f;
+  if(typeof o==='string'&&(o.startsWith('http://')||o.startsWith('https://'))) f.push(o);
+  else if(Array.isArray(o)) o.forEach(v=>findUrls(v,f,d+1));
+  else if(o&&typeof o==='object') Object.values(o).forEach(v=>findUrls(v,f,d+1));
+  return f;
+}
+
+function fmtNum(n) {
+  if (!n && n!==0) return '-';
+  n = parseInt(n);
+  if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1)+'K';
+  return n.toString();
+}
+
+function setLoading(btn, yes) {
+  if (yes) { btn.classList.add('loading'); btn.dataset.orig = btn.innerHTML; btn.innerHTML = '⏳ Loading...'; }
+  else { btn.classList.remove('loading'); btn.innerHTML = btn.dataset.orig || btn.innerHTML; }
+}
+
+// ═══════════════════════════════════════
+//  GAMES
+// ═══════════════════════════════════════
+const GAMES = [
+  // ── Online API ──
+  { id:'kuismerdeka',    icon:'🇮🇩', name:'Kuis Merdeka',    desc:'Seberapa tahu kamu soal Indonesia?',  path:'https://api.siputzx.my.id/api/r/kuismerdeka' },
+  { id:'tebakanime',     icon:'🎌', name:'Tebak Anime',      desc:'Seberapa weeb kamu?',                  path:'https://api.siputzx.my.id/api/r/tebakanime' },
+
+  // ── Local JSON — type qa (soal+jawaban teks) ──
+  { id:'asahotak',       icon:'🧠', name:'Asah Otak',        desc:'Uji logika & pengetahuan',             path:'./api/game/asahotak.json',       local:true, type:'qa' },
+  { id:'caklontong',     icon:'🧩', name:'Cak Lontong',      desc:'Teka-teki mbulet ala Cak Lontong',     path:'./api/game/caklontong.json',     local:true, type:'qa' },
+  { id:'siapakahaku',    icon:'🔍', name:'Siapa Kah Aku',    desc:'Tebak tokoh dari petunjuk',            path:'./api/game/siapakahaku.json',    local:true, type:'qa' },
+  { id:'susunkata',      icon:'🔤', name:'Susun Kata',       desc:'Susun huruf acak jadi kata',           path:'./api/game/susunkata.json',      local:true, type:'qa' },
+  { id:'tekateki',       icon:'🤔', name:'Teka-Teki',        desc:'Asah otak dengan teka-teki seru',      path:'./api/game/tekateki.json',       local:true, type:'qa' },
+  { id:'tebakkata',      icon:'💬', name:'Tebak Kata',       desc:'Tebak kata dari petunjuk',             path:'./api/game/tebakkata.json',      local:true, type:'qa' },
+  { id:'tebakkalimat',   icon:'📝', name:'Tebak Kalimat',    desc:'Lengkapi kalimat yang hilang',         path:'./api/game/tebakkalimat.json',   local:true, type:'qa' },
+  { id:'tebakkabupaten', icon:'🗺️', name:'Tebak Kabupaten',  desc:'Seberapa hafal peta Indonesia?',       path:'./api/game/tebakkabupaten.json', local:true, type:'qa' },
+  { id:'tebakkimia',     icon:'⚗️', name:'Tebak Kimia',      desc:'Uji pengetahuan kimia kamu',           path:'./api/game/tebakkimia.json',     local:true, type:'qa' },
+  { id:'tebaktebakan',   icon:'🎯', name:'Tebak-Tebakan',    desc:'Tebak-tebakan seru & lucu',            path:'./api/game/tebaktebakan.json',   local:true, type:'qa' },
+  { id:'asmaulhusna',    icon:'☪️', name:'Asmaul Husna',     desc:'Tebak nama-nama Allah',                path:'./api/game/asmaulhusna.json',    local:true, type:'qa' },
+  { id:'tebakjkt48',     icon:'🎤', name:'Tebak JKT48',      desc:'Seberapa fans JKT48 kamu?',            path:'./api/game/tebakjkt48.json',     local:true, type:'qa' },
+
+  // ── Local JSON — type img (soal+jawaban+gambar) ──
+  { id:'tebakbendera',   icon:'🚩', name:'Tebak Bendera',    desc:'Tebak negara dari bendera',            path:'./api/game/tebakbendera.json',   local:true, type:'bendera' },
+  { id:'tebakbendera2',  icon:'🏳️', name:'Tebak Bendera 2',  desc:'Bendera level lebih susah!',           path:'./api/game/tebakbendera2.json',  local:true, type:'bendera' },
+  { id:'tebakgambar',    icon:'🖼️', name:'Tebak Gambar',     desc:'Tebak gambar misteri',                 path:'./api/game/tebakgambar.json',    local:true, type:'imgqa' },
+  { id:'tebakdrakor',    icon:'🎬', name:'Tebak Drakor',     desc:'Seberapa drakor lovers kamu?',         path:'./api/game/tebakdrakor.json',    local:true, type:'imgqa' },
+  { id:'tebakepep',      icon:'👩‍🎤', name:'Tebak K-Pop',     desc:'Tebak idol K-Pop dari foto',           path:'./api/game/tebakepep.json',      local:true, type:'imgqa' },
+  { id:'tebakmakanan',   icon:'🍜', name:'Tebak Makanan',    desc:'Tebak makanan dari gambarnya',         path:'./api/game/tebakmakanan.json',   local:true, type:'imgqa' },
+
+  // ── Local JSON — type f100 (jawaban array) ──
+  { id:'family100',      icon:'👨‍👩‍👧', name:'Family 100',     desc:'Sebutkan jawaban sebanyak mungkin!',   path:'./api/game/family100.json',      local:true, type:'f100' },
+
+  // ── Local JSON — type lirik (tebak lagu) ──
+  { id:'tebaklirik',     icon:'🎵', name:'Tebak Lirik',      desc:'Tebak judul lagu dari liriknya',       path:'./api/game/tebaklirik.json',     local:true, type:'qa' },
+
+  // ── Local JSON — type noans (baca/bagi, no jawaban) ──
+  { id:'bucin',          icon:'💌', name:'Kata Bucin',       desc:'Kata-kata galau & romantis',           path:'./api/game/bucin.json',          local:true, type:'noans' },
+  { id:'dare',           icon:'😈', name:'Dare',             desc:'Tantangan seru untuk dimainkan',       path:'./api/game/dare.json',           local:true, type:'noans' },
+  { id:'truth',          icon:'🤫', name:'Truth',            desc:'Pertanyaan jujur-jujuran',             path:'./api/game/truth.json',          local:true, type:'noans' },
+
+  // ── Local JSON — type imgonly (tampil gambar, no jawaban) ──
+  { id:'renungan',       icon:'🌄', name:'Renungan',         desc:'Gambar renungan & motivasi',           path:'./api/game/renungan.json',       local:true, type:'imgonly' },
+];
+
+let currentGame = null;
+let gameScore = 0;
+let gameStreak = 0;
+let currentAnswer = '';   // string untuk qa/bendera/imgqa, array untuk f100
+let hintRevealed = 1;
+let hintUsed = 0;         // jumlah hint yg sudah dipakai per soal (max 4)
+let questionCounted = false;
+let gameAnswered = false;
+let f100Guessed = [];
+
+// Build game grid
+const gg = document.getElementById('game-grid');
+GAMES.forEach((g,i) => {
+  const t = document.createElement('div');
+  t.className = 'game-tile';
+  t.style.animationDelay = i*0.05+'s';
+  t.innerHTML = `<div class="game-tile-icon">${g.icon}</div><div class="game-tile-name">${g.name}</div>`;
+  t.onclick = () => selectGame(g);
+  gg.appendChild(t);
+});
+
+function selectGame(g) {
+  currentGame = g;
+  gameScore = 0; gameStreak = 0;
+  document.getElementById('gscore').textContent = 0;
+  document.getElementById('gstreak').textContent = 0;
+  document.getElementById('gname').textContent = g.icon + ' ' + g.name;
+  document.getElementById('gstart-icon').textContent = g.icon;
+  document.getElementById('gstart-title').textContent = g.name;
+  document.getElementById('gstart-desc').textContent = g.desc;
+  document.getElementById('game-selector').style.display = 'none';
+  document.getElementById('game-play').style.display = 'block';
+  document.getElementById('game-start').style.display = 'block';
+  document.getElementById('game-playing').style.display = 'none';
+}
+
+function backToGameSelect() {
+  document.getElementById('game-selector').style.display = 'block';
+  document.getElementById('game-play').style.display = 'none';
+}
+
+function startGame() {
+  document.getElementById('game-start').style.display = 'none';
+  document.getElementById('game-playing').style.display = 'block';
+  loadQuestion();
+}
+
+async function loadQuestion() {
+  const qEl      = document.getElementById('gquestion');
+  const hEl      = document.getElementById('ghint');
+  const rev      = document.getElementById('greveal');
+  const imgWrap  = document.getElementById('gimg-wrap');
+  const imgEl    = document.getElementById('gimg');
+  const hintArea = document.getElementById('ghint-area');
+  const insRow   = document.getElementById('gins-row');
+  const noAns    = document.getElementById('gnoans-msg');
+  const f100w    = document.getElementById('gf100-wrap');
+  const hintBtn  = document.getElementById('ghint-btn');
+  const fb       = document.getElementById('gfeedback');
+  const inp      = document.getElementById('gins-inp');
+
+  // reset
+  rev.classList.remove('show'); rev.textContent = '';
+  fb.style.display = 'none';
+  imgWrap.style.display = 'none';
+  f100w.style.display = 'none';
+  noAns.style.display = 'none';
+  hintArea.style.display = 'block';
+  insRow.style.display = 'flex';
+  hintBtn.style.display = '';
+  inp.value = '';
+  currentAnswer = '';
+  hintRevealed = 1;
+  hintUsed = 0;
+  questionCounted = false;
+  gameAnswered = false;
+  f100Guessed = [];
+  // reset tombol lihat
+  const hintCountEl = document.getElementById('ghint-count');
+  if (hintCountEl) hintCountEl.textContent = '4';
+  const hintBtnEl = document.getElementById('ghint-btn');
+  if (hintBtnEl) { hintBtnEl.disabled = false; hintBtnEl.style.opacity = '1'; }
+
+  const MAX_RETRY = 3;
+  for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
+    qEl.textContent = attempt === 1 ? '⏳ Memuat soal...' : `⏳ Mencoba lagi (${attempt}/${MAX_RETRY})...`;
+    hEl.textContent = '...';
+    try {
+      // ── Load data ──
+      if (currentGame.local) {
+        if (!currentGame._cache) {
+          const r = await fetch(currentGame.path);
+          const json = await r.json();
+          // support berbagai root key
+          currentGame._cache = Array.isArray(json) ? json : (json.soal || json.data || json.questions || []);
+        }
+      }
+
+      const g    = currentGame;
+      const type = g.type || 'qa';
+
+      // ── IMGONLY (renungan) ──
+      if (type === 'imgonly') {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        const url  = typeof item === 'string' ? item : (item.url || item.img || '');
+        imgEl.src = url;
+        imgWrap.style.display = 'block';
+        qEl.textContent = '🌄 Gambar Renungan';
+        hintArea.style.display = 'none';
+        insRow.style.display = 'none';
+        noAns.style.display = 'block';
+        hintBtn.style.display = 'none';
+        currentAnswer = '';
+        return;
+      }
+
+      // ── NOANS (bucin, dare, truth) ──
+      if (type === 'noans') {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        qEl.textContent = typeof item === 'string' ? item : (item.soal || item.text || JSON.stringify(item));
+        hintArea.style.display = 'none';
+        insRow.style.display = 'none';
+        noAns.style.display = 'block';
+        hintBtn.style.display = 'none';
+        currentAnswer = '';
+        return;
+      }
+
+      // ── BENDERA (tebakbendera, tebakbendera2) ──
+      if (type === 'bendera') {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        imgEl.src = item.img || '';
+        imgWrap.style.display = 'block';
+        qEl.textContent = '🚩 Negara apakah ini?';
+        currentAnswer = item.name || item.jawaban || '';
+        hEl.textContent = makeHint(currentAnswer, 1);
+        return;
+      }
+
+      // ── IMGQA (tebakgambar, drakor, epep, makanan) ──
+      if (type === 'imgqa') {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        const imgUrl = item.img || item.image || item.foto || item.url || '';
+        if (imgUrl) { imgEl.src = imgUrl; imgWrap.style.display = 'block'; }
+        const soal = item.pertanyaan || item.soal || item.question || '❓ Gambar apakah ini?';
+        const jawab = (item.jawaban || item.answer || item.nama || item.name || '').toString();
+        if (!jawab) throw new Error('Data kosong');
+        qEl.textContent = soal;
+        currentAnswer = jawab;
+        hEl.textContent = makeHint(jawab, 1);
+        return;
+      }
+
+      // ── F100 (family100) ──
+      if (type === 'f100') {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        qEl.textContent = '💯 ' + (item.soal || item.question || '');
+        currentAnswer = (item.jawaban || []).map(j => j.toString().toLowerCase());
+        f100Guessed = [];
+        hintArea.style.display = 'none';
+        hintBtn.style.display = 'none';
+        f100w.style.display = 'block';
+        renderF100(currentAnswer, f100Guessed);
+        inp.placeholder = 'Ketik salah satu jawaban...';
+        return;
+      }
+
+      // ── QA default (asahotak, caklontong, siapakahaku, susunkata, dll) ──
+      let soal, jawab;
+      if (g.local) {
+        const pool = g._cache;
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        soal  = item.pertanyaan || item.soal || item.question || item.tebakan || '';
+        jawab = (item.jawaban || item.answer || item.kunci || '').toString();
+        // susunkata: tambahkan tipe sebagai prefix
+        if (item.tipe) soal = '[' + item.tipe + '] ' + soal;
+      } else {
+        const json = await apiFetch(g.path);
+        const data = json.data || json;
+        soal  = data.pertanyaan || data.soal || data.question || data.tebakan || data.clue || data.kata || JSON.stringify(data);
+        jawab = (data.jawaban || data.answer || data.kunci || data.nama || '').toString();
+      }
+      if (!soal || !jawab) throw new Error('Data soal kosong');
+      currentAnswer = jawab;
+      questionCounted = false;
+      qEl.textContent = soal;
+      hEl.textContent = makeHint(jawab, 1);
+      inp.placeholder = 'Ketik jawaban kamu...';
+      return;
+
+    } catch(e) {
+      console.warn('Attempt', attempt, 'gagal:', e.message);
+      if (attempt === MAX_RETRY) {
+        qEl.innerHTML = '❌ Gagal memuat soal. <span onclick="loadQuestion()" style="color:var(--a);cursor:pointer;text-decoration:underline">Tap untuk retry</span>';
+      } else {
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+  }
+}
+
+function renderF100(all, guessed) {
+  const list = document.getElementById('gf100-list');
+  list.innerHTML = all.map(j => {
+    const found = guessed.includes(j);
+    return `<span style="padding:5px 12px;border-radius:8px;font-size:.8rem;font-weight:700;
+      background:${found ? 'rgba(74,222,128,.15)' : 'rgba(255,255,255,.05)'};
+      border:1px solid ${found ? 'var(--f)' : 'var(--border)'};
+      color:${found ? 'var(--f)' : 'var(--muted)'};transition:all .3s">${found ? j : '?'}</span>`;
+  }).join('');
+}
+
+function checkAnswer() {
+  const g   = currentGame;
+  const inp = document.getElementById('gins-inp');
+  const fb  = document.getElementById('gfeedback');
+  const raw = inp.value.trim();
+  if (!raw || !g) return;
+
+  // ── F100 ──
+  if (g.type === 'f100') {
+    const guess = raw.toLowerCase().trim();
+    inp.value = '';
+    if (f100Guessed.includes(guess)) {
+      showFeedback('⚠️ Sudah dijawab!', false); return;
+    }
+    const matched = (currentAnswer).find(j => j === guess || j.includes(guess) || guess.includes(j));
+    if (matched && !f100Guessed.includes(matched)) {
+      f100Guessed.push(matched);
+      gameScore += 10; gameStreak++;
+      document.getElementById('gscore').textContent = gameScore;
+      document.getElementById('gstreak').textContent = gameStreak;
+      renderF100(currentAnswer, f100Guessed);
+      showFeedback('✅ Betul! +10', true);
+    } else {
+      showFeedback('❌ Bukan jawaban yang tepat', false);
+    }
+    return;
+  }
+
+  if (!currentAnswer || gameAnswered) return;
+  const guess   = raw.trim().toLowerCase();
+  const correct = currentAnswer.toString().toLowerCase();
+  inp.value = '';
+
+  if (guess === correct || correct.includes(guess) || guess.includes(correct)) {
+    gameAnswered = true;
+    gameScore += 10; gameStreak++;
+    document.getElementById('gscore').textContent = gameScore;
+    document.getElementById('gstreak').textContent = gameStreak;
+    document.getElementById('ghint').textContent = currentAnswer.split('').join(' ');
+    showFeedback('🎉 BETUL! +10 · Soal baru...', true);
+    setTimeout(() => loadQuestion(), 1200);
+  } else {
+    showFeedback('❌ Salah! Coba lagi atau tap LIHAT', false);
+  }
+}
+
+function showFeedback(msg, isOk) {
+  const fb = document.getElementById('gfeedback');
+  fb.style.display = 'block';
+  fb.style.background = isOk ? 'rgba(74,222,128,.12)' : 'rgba(255,77,109,.12)';
+  fb.style.border = `1px solid ${isOk ? 'var(--f)' : 'var(--c)'}`;
+  fb.style.color = isOk ? 'var(--f)' : 'var(--c)';
+  fb.textContent = msg;
+  if (isOk) setTimeout(() => { fb.style.display = 'none'; }, 2000);
+}
+
+function makeHint(word, revealed) {
+  const w = word.toString();
+  const shown = new Set();
+  // Always show first char
+  if (w[0] && w[0] !== ' ') shown.add(0);
+  // Random extra reveals
+  let tries = 0;
+  while (shown.size < Math.min(revealed, w.length) && tries < 200) {
+    const idx = Math.floor(Math.random() * w.length);
+    if (w[idx] !== ' ') shown.add(idx);
+    tries++;
+  }
+  return w.split('').map((c,i) => c === ' ' ? '  ' : (shown.has(i) ? c : '_')).join(' ');
+}
+
+function addHint() {
+  if (!currentAnswer || gameAnswered) return;
+  const MAX_HINT = 4;
+  if (hintUsed >= MAX_HINT) return;
+
+  const ansLen = currentAnswer.replace(/ /g, '').length;
+
+  // Jika jawaban <= 4 huruf, satu kali lihat langsung buka semua → skor 0
+  if (ansLen <= 4) {
+    hintUsed = MAX_HINT;
+    hintRevealed = currentAnswer.length;
+    document.getElementById('ghint').textContent = currentAnswer.split('').join(' ');
+    // skor jadi 0
+    gameScore = 0;
+    document.getElementById('gscore').textContent = gameScore;
+    const hintCountEl = document.getElementById('ghint-count');
+    if (hintCountEl) hintCountEl.textContent = '0';
+    const hintBtnEl = document.getElementById('ghint-btn');
+    if (hintBtnEl) { hintBtnEl.disabled = true; hintBtnEl.style.opacity = '.4'; }
+    showFeedback('⚠️ Jawaban pendek, semua terbuka! Skor jadi 0', false);
+    return;
+  }
+
+  hintUsed++;
+  const remaining = MAX_HINT - hintUsed;
+
+  // Kurangi skor per hint (min 0)
+  gameScore = Math.max(0, gameScore - 2);
+  document.getElementById('gscore').textContent = gameScore;
+
+  hintRevealed = Math.min(hintRevealed + 1, currentAnswer.length);
+  document.getElementById('ghint').textContent = makeHint(currentAnswer, hintRevealed);
+
+  const hintCountEl = document.getElementById('ghint-count');
+  if (hintCountEl) hintCountEl.textContent = remaining;
+
+  if (remaining === 0) {
+    const hintBtnEl = document.getElementById('ghint-btn');
+    if (hintBtnEl) { hintBtnEl.disabled = true; hintBtnEl.style.opacity = '.4'; }
+    showFeedback('💡 Hint habis! Tulis jawaban atau nyerah.', false);
+  }
+}
+
+function revealAns() {
+  if (!currentAnswer) return;
+  document.getElementById('ghint').textContent = currentAnswer.split('').join(' ');
+  const rev = document.getElementById('greveal');
+  rev.textContent = '✅ Jawaban: ' + currentAnswer;
+  rev.classList.add('show');
+}
+
+function nyerah() {
+  if (!currentGame) return;
+  // tipe yang tidak punya jawaban (noans/imgonly) → langsung soal baru tanpa penalti
+  const type = currentGame.type || 'qa';
+  if (type === 'noans' || type === 'imgonly') {
+    loadQuestion(); return;
+  }
+  // kurangi skor -5
+  gameScore = Math.max(0, gameScore - 5);
+  gameStreak = 0;
+  document.getElementById('gscore').textContent = gameScore;
+  document.getElementById('gstreak').textContent = gameStreak;
+  // tampilkan jawaban dulu
+  if (currentAnswer) {
+    document.getElementById('ghint').textContent = currentAnswer.split('').join(' ');
+    const rev = document.getElementById('greveal');
+    rev.textContent = '🏳 Nyerah! Jawaban: ' + currentAnswer;
+    rev.classList.add('show');
+    rev.style.color = 'var(--c)';
+  }
+  showFeedback('🏳 Nyerah! -5 skor. Soal baru dimuat...', false);
+  setTimeout(() => loadQuestion(), 1400);
+}
+
+async function nextQ() {
+  const g = currentGame;
+  const type = g ? g.type || 'qa' : 'qa';
+
+  // noans & imgonly: auto +5 tiap soal baru
+  if ((type === 'noans' || type === 'imgonly') && !questionCounted) {
+    questionCounted = true;
+    gameStreak++; gameScore += 5;
+    document.getElementById('gscore').textContent = gameScore;
+    document.getElementById('gstreak').textContent = gameStreak;
+  }
+  // qa / bendera / imgqa: score hanya kalau dijawab benar
+  // f100: score udah dihitung per jawaban
+
+  const btn = document.querySelector('[onclick="nextQ()"]');
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
+  await loadQuestion();
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+// ═══════════════════════════════════════
+//  AI CHAT — Groq API (llama-3.3-70b)
+// ═══════════════════════════════════════
+const GROQ_KEY  = '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';
+const AI_MODELS_LIST = [
+  { id:'llama-3.3-70b-versatile',       label:'Llama 3.3 70B',  color:'var(--a)' },
+  { id:'llama-3.1-8b-instant',          label:'Llama 3.1 8B',   color:'var(--f)' },
+  { id:'gemma2-9b-it',                  label:'Gemma 2 9B',     color:'var(--b)' },
+  { id:'mistral-saba-24b',              label:'Mistral 24B',    color:'var(--d)' },
+];
+let activeGroqModel = AI_MODELS_LIST[0];
+let aiHistory = [];
+
+// Init model chips
+const aiChipsEl = document.getElementById('ai-model-chips');
+AI_MODELS_LIST.forEach((m, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'model-chip' + (i === 0 ? ' active' : '');
+  btn.style.cssText = `--panel-color:${m.color}`;
+  btn.textContent = m.label;
+  btn.onclick = () => {
+    document.querySelectorAll('#ai-model-chips .model-chip').forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    activeGroqModel = m;
+    document.getElementById('ai-model-name').textContent = m.label;
+    aiHistory = []; // reset history saat ganti model
+  };
+  aiChipsEl.appendChild(btn);
+});
+
+if (typeof marked !== 'undefined') {
+  marked.setOptions({ breaks: true });
+}
+
+function aiRenderMarkdown(text) {
+  if (typeof marked === 'undefined') return text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return marked.parse(text);
+}
+
+function aiAddMsg(text, role) {
+  const msgs = document.getElementById('ai-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = role === 'user' ? 'ai-msg-user' : 'ai-msg-bot';
+
+  const avatar = document.createElement('div');
+  avatar.className = role === 'user' ? 'ai-avatar-user' : 'ai-avatar-bot';
+  avatar.textContent = role === 'user' ? 'You' : '🤖';
+
+  const bubble = document.createElement('div');
+  bubble.className = role === 'user' ? 'ai-bubble-user' : 'ai-bubble-bot';
+
+  if (role === 'user') {
+    bubble.textContent = text;
+  } else {
+    bubble.innerHTML = aiRenderMarkdown(text);
+  }
+
+  wrap.appendChild(avatar);
+  wrap.appendChild(bubble);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+  return bubble;
+}
+
+async function sendAiChat() {
+  const inp  = document.getElementById('ai-inp');
+  const btn  = document.getElementById('ai-send-btn');
+  const typing = document.getElementById('ai-typing');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = '';
+  inp.disabled = true;
+  btn.disabled = true;
+  aiAddMsg(text, 'user');
+  aiHistory.push({ role: 'user', content: text });
+  typing.style.display = 'block';
+  document.getElementById('ai-msgs').scrollTop = document.getElementById('ai-msgs').scrollHeight;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: activeGroqModel.id,
+        messages: [
+          { role: 'system', content: 'Kamu adalah ZiiCodex AI, asisten AI yang ramah, pintar, dan membantu. Jawab pertanyaan dengan jelas dan informatif dalam bahasa yang dipakai user (Indonesia atau Inggris). Bisa menjawab semua topik termasuk sains, teknologi, sejarah, hiburan, dan lainnya.' },
+          ...aiHistory
+        ],
+        temperature: 0.7,
+        max_tokens: 4096,
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `Error ${res.status}`);
+    }
+
+    const data   = await res.json();
+    const answer = data.choices?.[0]?.message?.content || 'Tidak ada respons.';
+
+    aiHistory.push({ role: 'assistant', content: answer });
+    if (aiHistory.length > 20) aiHistory.splice(0, 2);
+
+    typing.style.display = 'none';
+    aiAddMsg(answer, 'ai');
+
+  } catch(e) {
+    typing.style.display = 'none';
+    aiAddMsg('❌ Error: ' + e.message, 'ai');
+  } finally {
+    inp.disabled = false;
+    btn.disabled = false;
+    inp.focus();
+  }
+}
+
+function clearAiChat() {
+  const msgs = document.getElementById('ai-msgs');
+  msgs.innerHTML = '';
+  aiHistory = [];
+  aiAddMsg('Chat di-reset. Tanyakan apa aja! 👋', 'ai');
+}
+
+// ═══════════════════════════════════════
+//  DOWNLOADER — sxtream API
+// ═══════════════════════════════════════
+const DL_SOURCES = [
+  {
+    icon:'🌐', name:'All Social Media', sub:'TikTok, IG, FB, Twitter, dll',
+    path:'https://api.sxtream.my.id/downloader/aio',
+    ph:'Paste URL dari sosmed manapun...'
+  },
+  {
+    icon:'🎵', name:'TikTok',  sub:'Video & Audio TikTok',
+    path:'https://api.sxtream.my.id/downloader/tiktok',
+    ph:'https://vt.tiktok.com/...'
+  },
+  {
+    icon:'▶️', name:'YouTube MP4', sub:'Download video YouTube',
+    path:'https://api.sxtream.my.id/downloader/ytmp4',
+    ph:'https://youtu.be/...'
+  },
+  {
+    icon:'🎶', name:'YouTube MP3', sub:'Download audio YouTube',
+    path:'https://api.sxtream.my.id/downloader/ytmp3',
+    ph:'https://youtu.be/...'
+  },
+];
+
+const dlg = document.getElementById('dl-grid');
+DL_SOURCES.forEach((s, i) => {
+  const p = document.createElement('div');
+  p.className = 'panel';
+  p.style.cssText = `--panel-color:var(--b);animation-delay:${i*0.06}s`;
+  p.innerHTML = `
+    <div class="panel-head">
+      <div class="panel-icon">${s.icon}</div>
+      <div><div class="panel-title">${s.name}</div><div class="panel-sub">${s.sub}</div></div>
+    </div>
+    <div class="inp-row">
+      <input class="inp" placeholder="${s.ph}" id="dl-inp-${i}">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doDownload(this,'${s.path}','dl-inp-${i}','dl-res-${i}')">⬇ Download</button>
+    <div class="dl-result" id="dl-res-${i}"></div>`;
+  dlg.appendChild(p);
+});
+
+async function doDownload(btn, path, inpId, resId) {
+  const url = document.getElementById(inpId).value.trim();
+  if (!url) { alert('Masukkan URL dulu!'); return; }
+  setLoading(btn, true);
+  const res = document.getElementById(resId);
+  res.className = 'dl-result';
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch(path, { url });
+
+    // sxtream API response parser
+    // support: { result: { url, urls, medias, download_url } } atau nested
+    const r = json.result || json.data || json;
+
+    // Kumpulkan semua media items
+    const items = [];
+
+    // Format: result.medias = [{url, quality, type}]
+    if (r.medias && Array.isArray(r.medias)) {
+      r.medias.forEach(m => {
+        if (m.url) items.push({ url: m.url, label: m.quality || m.type || 'File', ext: m.ext || '' });
+      });
+    }
+    // Format: result.urls = [{url, ...}] atau array of strings
+    if (!items.length && r.urls) {
+      const arr = Array.isArray(r.urls) ? r.urls : [];
+      arr.forEach((u, idx) => {
+        const link = typeof u === 'string' ? u : u.url || u.download_url || '';
+        if (link) items.push({ url: link, label: u.quality || u.type || `File ${idx+1}`, ext: '' });
+      });
+    }
+    // Format: result.url = string langsung
+    if (!items.length && typeof r.url === 'string' && r.url.startsWith('http')) {
+      items.push({ url: r.url, label: 'Download', ext: '' });
+    }
+    // Format: result.download_url
+    if (!items.length && r.download_url) {
+      items.push({ url: r.download_url, label: 'Download', ext: '' });
+    }
+    // Format: result.video / result.audio
+    if (!items.length) {
+      if (r.video) items.push({ url: r.video, label: '🎬 Video', ext: 'mp4' });
+      if (r.audio) items.push({ url: r.audio, label: '🎵 Audio', ext: 'mp3' });
+    }
+    // Fallback: cari semua URL dari response
+    if (!items.length) {
+      findUrls(json).slice(0, 5).forEach((u, idx) => {
+        items.push({ url: u, label: `File ${idx+1}`, ext: '' });
+      });
+    }
+
+    res.classList.add('show');
+    if (items.length) {
+      // Metadata (title, thumbnail)
+      const title = r.title || r.filename || '';
+      const thumb = r.thumbnail || r.cover || r.thumb || '';
+      if (thumb || title) {
+        const meta = document.createElement('div');
+        meta.style.cssText = 'display:flex;gap:10px;align-items:center;margin-bottom:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid var(--border)';
+        meta.innerHTML = `
+          ${thumb ? `<img src="${thumb}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">` : ''}
+          ${title ? `<div style="font-size:.82rem;font-weight:700;color:var(--text);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${title}</div>` : ''}
+        `;
+        res.appendChild(meta);
+      }
+
+      items.forEach(item => {
+        const ext   = item.ext || item.url.split('?')[0].split('.').pop().toLowerCase();
+        const emoji = ['mp4','webm','mkv','mov'].includes(ext) ? '🎬'
+                    : ['mp3','m4a','ogg','flac'].includes(ext) ? '🎵' : '📄';
+        const el = document.createElement('div');
+        el.className = 'dl-media-item';
+        el.innerHTML = `
+          <div class="dl-media-info">
+            <div class="dl-media-title">${emoji} ${item.label}</div>
+            <div class="dl-media-meta" style="font-size:.68rem;word-break:break-all;opacity:.7">${item.url.slice(0,55)}...</div>
+          </div>
+          <a href="${item.url}" target="_blank" download
+            class="btn btn-primary btn-sm" style="--panel-color:var(--b);white-space:nowrap;text-decoration:none">
+            ⬇ Unduh
+          </a>`;
+        res.appendChild(el);
+      });
+    } else {
+      res.innerHTML = `<div style="color:var(--c);font-size:.82rem">❌ Tidak ada file yang bisa didownload.<br><span style="opacity:.6;font-size:.75rem">Pastikan URL valid & dapat diakses.</span></div>`;
+    }
+  } catch(e) {
+    res.classList.add('show');
+    res.innerHTML = `<div style="color:var(--c);font-size:.82rem">❌ ${e.message}</div>`;
+  }
+  setLoading(btn, false);
+}
+
+
+// ═══════════════════════════════════════
+//  STALKER
+// ═══════════════════════════════════════
+const STALK_TARGETS = [
+  { icon:'📱', name:'TikTok',    path:'https://api.siputzx.my.id/api/s/tiktok',    ph:'caliphdev',   key:'username' },
+  { icon:'📷', name:'Instagram', path:'https://api.siputzx.my.id/api/s/instagram', ph:'username',    key:'username' },
+  { icon:'🐦', name:'Twitter',   path:'https://api.siputzx.my.id/api/s/twitter',   ph:'username',    key:'username' },
+  { icon:'▶️', name:'YouTube',   path:'https://api.siputzx.my.id/api/s/youtube',   ph:'@handle',     key:'username' },
+];
+
+const sg = document.getElementById('stalk-grid');
+STALK_TARGETS.forEach((s,i) => {
+  const p = document.createElement('div');
+  p.className = 'panel';
+  p.style.cssText = `--panel-color:var(--c);animation-delay:${i*0.06}s`;
+  p.innerHTML = `
+    <div class="panel-head">
+      <div class="panel-icon">${s.icon}</div>
+      <div><div class="panel-title">${s.name} Stalker</div><div class="panel-sub">Cek profil user</div></div>
+    </div>
+    <div class="inp-row">
+      <input class="inp" placeholder="${s.ph}" id="stk-inp-${i}">
+      <button class="btn btn-primary" onclick="doStalk(this,'${s.path}','stk-inp-${i}','stk-res-${i}')">🔍</button>
+    </div>
+    <div class="profile-card" id="stk-res-${i}"></div>`;
+  sg.appendChild(p);
+});
+
+async function doStalk(btn, path, inpId, resId) {
+  const username = document.getElementById(inpId).value.trim().replace('@','');
+  if (!username) return;
+  setLoading(btn, true);
+  const card = document.getElementById(resId);
+  card.classList.remove('show'); card.innerHTML = '';
+  try {
+    const json = await apiFetch(path, { username });
+    const d = json.data || json.result || json;
+    const avatar = d.avatar || d.profile_pic || d.profilePicture || d.photo || d.thumbnail || '';
+    const name   = d.name || d.fullname || d.full_name || d.nickname || d.title || username;
+    const handle = d.username || d.screen_name || d.handle || '@'+username;
+    const bio    = d.bio || d.description || d.signature || '';
+    const followers = d.followers || d.follower_count || d.followers_count || d.subscriberCount || d.subscriber_count || '';
+    const following = d.following || d.following_count || d.followingCount || '';
+    const posts     = d.posts || d.media_count || d.tweet_count || d.video_count || d.videoCount || '';
+
+    const avatarHTML = avatar
+      ? `<img class="profile-avatar" src="${avatar}" onerror="this.style.display='none'">`
+      : `<div class="profile-avatar-placeholder">👤</div>`;
+
+    card.innerHTML = `
+      <div class="profile-top">
+        ${avatarHTML}
+        <div>
+          <div class="profile-name">${name}</div>
+          <div class="profile-handle">${handle}</div>
+          ${bio ? `<div class="profile-bio">${bio.slice(0,120)}${bio.length>120?'...':''}</div>` : ''}
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="pstat"><div class="pstat-num">${fmtNum(followers)||'-'}</div><div class="pstat-label">Followers</div></div>
+        <div class="pstat"><div class="pstat-num">${fmtNum(following)||'-'}</div><div class="pstat-label">Following</div></div>
+        <div class="pstat"><div class="pstat-num">${fmtNum(posts)||'-'}</div><div class="pstat-label">Posts</div></div>
+      </div>`;
+    card.classList.add('show');
+  } catch(e) {
+    card.innerHTML = `<div style="color:var(--c);font-size:.82rem">❌ ${e.message}</div>`;
+    card.classList.add('show');
+  }
+  setLoading(btn, false);
+}
+
+// ═══════════════════════════════════════
+//  TOOLS
+// ═══════════════════════════════════════
+const tg = document.getElementById('tools-grid');
+
+// QR Code
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--f)';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">📊</div><div><div class="panel-title">QR Generator</div><div class="panel-sub">Teks / URL → QR Code</div></div></div>
+    <input class="inp" id="qr-inp" placeholder="https://example.com atau teks apapun" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doQR(this)">Generate QR</button>
+    <img class="tool-result-img" id="qr-img">`;
+  tg.appendChild(p);
+})();
+
+async function doQR(btn) {
+  const text = document.getElementById('qr-inp').value.trim();
+  if (!text) return;
+  setLoading(btn, true);
+  try {
+    const encodedText = encodeURIComponent(text);
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedText}`;
+    const img = document.getElementById('qr-img');
+    img.src = url; img.classList.add('show');
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading(btn, false);
+}
+
+// Short Link
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--f);animation-delay:.05s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">🔗</div><div><div class="panel-title">Short Link</div><div class="panel-sub">Perpendek URL panjang</div></div></div>
+    <input class="inp" id="sl-inp" placeholder="https://example.com/very-long-url/here" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doShortlink(this)">Perpendek</button>
+    <div class="result" id="sl-res"></div>`;
+  tg.appendChild(p);
+})();
+
+async function doShortlink(btn) {
+  const url = document.getElementById('sl-inp').value.trim();
+  if (!url) return;
+  setLoading(btn, true);
+  const res = document.getElementById('sl-res');
+  try {
+    const r = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+    const short = await r.text();
+    res.className = 'result show neutral';
+    res.innerHTML = `<b>🔗 Short URL:</b>\n<a href='${short}' target='_blank' style='color:var(--a)'>${short}</a>`;
+  } catch(e) { res.className='result show err'; res.textContent='❌ '+e.message; }
+  setLoading(btn, false);
+}
+
+// IP Info
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--f);animation-delay:.1s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">🌐</div><div><div class="panel-title">IP Info</div><div class="panel-sub">Cek detail IP address</div></div></div>
+    <input class="inp" id="ip-inp" placeholder="8.8.8.8" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doIP(this)">Cek IP</button>
+    <div class="stat-grid" id="ip-res"></div>`;
+  tg.appendChild(p);
+})();
+
+async function doIP(btn) {
+  const ip = document.getElementById('ip-inp').value.trim();
+  if (!ip) return;
+  setLoading(btn, true);
+  const res = document.getElementById('ip-res');
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch(`https://ipapi.co/${ip}/json/`);
+    const d = json.data || json.result || json;
+    const fields = [
+      ['IP', d.ip||d.query], ['Negara', d.country||d.countryName], ['Kota', d.city],
+      ['Region', d.regionName||d.region], ['ISP', d.isp||d.org], ['Timezone', d.timezone],
+      ['Lat', d.lat], ['Lon', d.lon],
+    ];
+    fields.filter(f=>f[1]).forEach(([l,v]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${l}</div><div class="stat-item-val">${v}</div>`;
+      res.appendChild(i);
+    });
+  } catch(e) { res.innerHTML = `<div style="color:var(--c)">${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+// Screenshot
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--f);animation-delay:.15s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">📸</div><div><div class="panel-title">Screenshot</div><div class="panel-sub">Screenshot website</div></div></div>
+    <input class="inp" id="ss-inp" placeholder="https://example.com" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doSS(this)">Screenshot</button>
+    <img class="tool-result-img" id="ss-img">`;
+  tg.appendChild(p);
+})();
+
+async function doSS(btn) {
+  const url = document.getElementById('ss-inp').value.trim();
+  if (!url) return;
+  setLoading(btn, true);
+  const img = document.getElementById('ss-img');
+  img.classList.remove('show');
+  try {
+    // pakai screenshotapi gratis
+    const ssUrl = `https://shot.screenshotapi.net/screenshot?token=free&url=${encodeURIComponent(url)}&output=image&file_type=png&wait_for_event=load`;
+    img.src = ssUrl; img.classList.add('show');
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading(btn, false);
+}
+
+// Pastebin
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--f);animation-delay:.2s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">📝</div><div><div class="panel-title">Pastebin</div><div class="panel-sub">Upload teks → dapatkan link</div></div></div>
+    <textarea class="inp" id="pb-inp" rows="4" placeholder="Teks yang mau di-upload..." style="margin-bottom:10px;resize:vertical"></textarea>
+    <button class="btn btn-primary btn-full" onclick="doPaste(this)">Upload</button>
+    <div class="result" id="pb-res"></div>`;
+  tg.appendChild(p);
+})();
+
+async function doPaste(btn) {
+  const text = document.getElementById('pb-inp').value.trim();
+  if (!text) return;
+  setLoading(btn, true);
+  const res = document.getElementById('pb-res');
+  try {
+    const fd = new FormData();
+    fd.append('content', text); fd.append('syntax', 'text'); fd.append('expiry_days', '7');
+    const r = await fetch('https://dpaste.com/api/v2/', { method:'POST', body:fd });
+    const link = (await r.text()).trim().replace(/['"]/g,'');
+    res.className = 'result show neutral';
+    res.innerHTML = `<b>📋 Link:</b>\n<a href='${link}' target='_blank' style='color:var(--a)'>${link}</a>`;
+  } catch(e) { res.className='result show err'; res.textContent='❌ '+e.message; }
+  setLoading(btn, false);
+}
+
+// ═══════════════════════════════════════
+//  INFO
+// ═══════════════════════════════════════
+const ig = document.getElementById('info-grid');
+
+function makeInfoPanel(icon, title, sub, path, params, btnLabel, renderId, delay, renderFn) {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText=`--panel-color:var(--g);animation-delay:${delay}s`;
+  const inps = params.map((pr,i) => `<input class="inp" id="${renderId}-i${i}" placeholder="${pr.ph}" style="margin-bottom:8px">`).join('');
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">${icon}</div><div><div class="panel-title">${title}</div><div class="panel-sub">${sub}</div></div></div>
+    ${inps}
+    <button class="btn btn-primary btn-full" onclick="doInfo(this,'${path}',[${params.map((_,i)=>`'${renderId}-i${i}'`)}],'${renderId}',${renderFn})">${btnLabel}</button>
+    <div class="stat-grid" id="${renderId}"></div>`;
+  ig.appendChild(p);
+}
+
+async function doInfo(btn, path, inpIds, resId, renderFn) {
+  const params = {};
+  inpIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.value.trim()) params[el.dataset.key||'q'] = el.value.trim();
+  });
+  setLoading(btn, true);
+  const res = document.getElementById(resId);
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch(path, params);
+    renderFn(json, res);
+  } catch(e) {
+    res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`;
+  }
+  setLoading(btn, false);
+}
+
+function renderKV(obj, container, maxDepth=1, depth=0) {
+  if (depth > maxDepth || !obj || typeof obj !== 'object') return;
+  Object.entries(obj).forEach(([k,v]) => {
+    if (typeof v === 'object' || Array.isArray(v)) return;
+    const i = document.createElement('div');
+    i.className = 'stat-item';
+    i.innerHTML = `<div class="stat-item-label">${k}</div><div class="stat-item-val">${v}</div>`;
+    container.appendChild(i);
+  });
+}
+
+// World Stats
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g)';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">🌍</div><div><div class="panel-title">World Stats</div><div class="panel-sub">Statistik dunia live</div></div></div>
+    <button class="btn btn-primary btn-full" onclick="doWorldStats(this)">Cek Sekarang</button>
+    <div class="stat-grid" id="ws-res"></div>`;
+  ig.appendChild(p);
+})();
+
+async function doWorldStats(btn) {
+  setLoading(btn, true);
+  const res = document.getElementById('ws-res');
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch('https://api.siputzx.my.id/api/worldometers/stats');
+    const d = json.data || json;
+    const flat = {};
+    function flatten(o, prefix='') {
+      if (!o || typeof o !== 'object') return;
+      Object.entries(o).forEach(([k,v]) => {
+        if (typeof v === 'object') flatten(v, prefix ? prefix+' › '+k : k);
+        else flat[prefix ? prefix+' › '+k : k] = v;
+      });
+    }
+    flatten(d);
+    Object.entries(flat).slice(0, 16).forEach(([k,v]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${k}</div><div class="stat-item-val">${typeof v==='number'?v.toLocaleString():v}</div>`;
+      res.appendChild(i);
+    });
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+// Kurs
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g);animation-delay:.05s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">💸</div><div><div class="panel-title">Kurs Rupiah</div><div class="panel-sub">Nilai tukar mata uang</div></div></div>
+    <button class="btn btn-primary btn-full" onclick="doKurs(this)">Cek Kurs</button>
+    <div class="stat-grid" id="kurs-res"></div>`;
+  ig.appendChild(p);
+})();
+
+async function doKurs(btn) {
+  setLoading(btn, true);
+  const res = document.getElementById('kurs-res');
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch('https://open.er-api.com/v6/latest/USD');
+    const rates = json.rates || {};
+    const idrRate = rates['IDR'] || 1;
+    const currencies = ['USD','EUR','GBP','JPY','SGD','MYR','AUD','CNY','SAR','KRW'];
+    currencies.forEach(cur => {
+      if (!rates[cur]) return;
+      const rateToIDR = (idrRate / rates[cur]);
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">1 ${cur}</div><div class="stat-item-val">Rp ${rateToIDR.toLocaleString('id-ID',{maximumFractionDigits:0})}</div>`;
+      res.appendChild(i);
+    });
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+// Cuaca
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g);animation-delay:.1s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">🌤️</div><div><div class="panel-title">Cuaca</div><div class="panel-sub">Info cuaca kota</div></div></div>
+    <input class="inp" id="wx-inp" placeholder="Jakarta" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doCuaca(this)">Cek Cuaca</button>
+    <div class="stat-grid" id="wx-res"></div>`;
+  ig.appendChild(p);
+})();
+
+async function doCuaca(btn) {
+  const city = document.getElementById('wx-inp').value.trim() || 'Jakarta';
+  setLoading(btn, true);
+  const res = document.getElementById('wx-res');
+  res.innerHTML = '';
+  try {
+    // Step 1: geocoding
+    const geo = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=id`)).json();
+    if (!geo.results?.length) throw new Error('Kota tidak ditemukan');
+    const { name, latitude, longitude, country } = geo.results[0];
+    // Step 2: cuaca
+    const wx = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,windspeed_10m&timezone=auto`)).json();
+    const cw = wx.current_weather;
+    const wmo = {0:'Cerah',1:'Mostly cerah',2:'Berawan sebagian',3:'Mendung',45:'Kabut',48:'Kabut beku',51:'Gerimis ringan',61:'Hujan ringan',63:'Hujan sedang',65:'Hujan lebat',71:'Salju ringan',80:'Hujan lokal',95:'Badai',96:'Badai+hujan es'};
+    const fields = [
+      ['🏙️ Kota', `${name}, ${country}`],
+      ['🌡️ Suhu', cw.temperature + '°C'],
+      ['💨 Kecepatan Angin', cw.windspeed + ' km/h'],
+      ['🌤️ Kondisi', wmo[cw.weathercode] || 'Kode: '+cw.weathercode],
+      ['🕒 Waktu', cw.time?.replace('T',' ')],
+    ];
+    fields.filter(f=>f[1]).forEach(([l,v]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${l}</div><div class="stat-item-val">${v}</div>`;
+      res.appendChild(i);
+    });
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+// MBG
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g);animation-delay:.15s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">💰</div><div><div class="panel-title">Crypto Price</div><div class="panel-sub">Harga crypto live (IDR)</div></div></div>
+    <button class="btn btn-primary btn-full" onclick="doMBG(this)">Cek Harga</button>
+    <div class="stat-grid" id="mbg-res"></div>`;
+  ig.appendChild(p);
+})();
+
+async function doMBG(btn) {
+  setLoading(btn, true);
+  const res = document.getElementById('mbg-res');
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,dogecoin&vs_currencies=idr,usd');
+    const map = {'bitcoin':'₿ Bitcoin','ethereum':'Ξ Ethereum','binancecoin':'BNB','solana':'◎ Solana','dogecoin':'Ð Dogecoin'};
+    Object.entries(json).forEach(([id, vals]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${map[id]||id}</div><div class="stat-item-val">Rp ${vals.idr?.toLocaleString('id-ID')||'-'}</div>`;
+      res.appendChild(i);
+    });
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+
+// ── Free Fire Stalk ──
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g);animation-delay:.2s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">🔥</div><div><div class="panel-title">Free Fire Stalk</div><div class="panel-sub">Cek profil akun FF</div></div></div>
+    <input class="inp" id="ff-inp" placeholder="Contoh: 775417067" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doFFStalk(this)">🔍 Cek Sekarang</button>
+    <div class="stat-grid" id="ff-res"></div>`;
+  ig.appendChild(p);
+})();
+
+async function doFFStalk(btn) {
+  const uid = document.getElementById('ff-inp').value.trim();
+  if (!uid) return;
+  setLoading(btn, true);
+  const res = document.getElementById('ff-res');
+  res.innerHTML = '';
+  try {
+    const json = await apiFetch(`https://api.covenant.sbs/api/stalk/freefire?uid=${encodeURIComponent(uid)}`);
+    if (!json?.status || !json?.data) throw new Error('ID tidak ditemukan');
+    const r = json.data;
+    const fields = [
+      ['🆔 User ID', r.uid],
+      ['👤 Nickname', r.name],
+      ['📊 Level', r.level],
+      ['⭐ EXP', r.exp?.toLocaleString()],
+      ['🌍 Region', r.region],
+      ['❤️ Likes', r.likes ?? '-'],
+      ['🏆 BR Rank Point', r.br_rank_point],
+      ['🥇 BR Max Rank', r.br_max_rank],
+      ['🎯 CS Rank Point', r.cs_rank_point ?? '-'],
+      ['🏅 CS Max Rank', r.cs_max_rank],
+      ['👥 Guild', r.guild_name ?? '-'],
+      ['🆔 Guild ID', r.guild_id ?? '-'],
+      ['🐾 Pet ID', r.pet_id ?? '-'],
+      ['📈 Pet Level', r.pet_level ?? '-'],
+      ['⚧ Gender', r.gender ?? '-'],
+      ['🌐 Language', r.language ?? '-'],
+      ['📅 Created', r.created_at],
+      ['🕒 Last Login', r.last_login],
+      ['🧾 Bio', r.signature ?? '-'],
+    ];
+    fields.filter(f=>f[1]!=null).forEach(([l,v]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${l}</div><div class="stat-item-val">${v}</div>`;
+      res.appendChild(i);
+    });
+    if (r.banner_image) {
+      const img = document.createElement('div');
+      img.style.cssText = 'grid-column:1/-1;margin-top:8px';
+      img.innerHTML = `<img src="${r.banner_image}" style="width:100%;border-radius:10px;object-fit:cover">`;
+      res.appendChild(img);
+    }
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+// ── Instagram Stalk ──
+(() => {
+  const p = document.createElement('div');
+  p.className = 'panel'; p.style.cssText='--panel-color:var(--g);animation-delay:.25s';
+  p.innerHTML = `
+    <div class="panel-head"><div class="panel-icon">📸</div><div><div class="panel-title">Instagram Stalk</div><div class="panel-sub">Cek profil akun IG</div></div></div>
+    <input class="inp" id="ig-inp" placeholder="Contoh: cristiano" style="margin-bottom:10px">
+    <button class="btn btn-primary btn-full" onclick="doIGStalk(this)">🔍 Cek Sekarang</button>
+    <div class="stat-grid" id="ig-res"></div>`;
+  ig.appendChild(p);
+})();
+
+function shortNum(n) {
+  if (!n) return '0';
+  if (n >= 1e9) return (n/1e9).toFixed(1).replace('.0','') + ' miliar';
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace('.0','') + ' jt';
+  if (n >= 1e3) return (n/1e3).toFixed(1).replace('.0','') + ' rb';
+  return n.toString();
+}
+
+async function doIGStalk(btn) {
+  const username = document.getElementById('ig-inp').value.trim().replace('@','');
+  if (!username) return;
+  setLoading(btn, true);
+  const res = document.getElementById('ig-res');
+  res.innerHTML = '';
+  try {
+    const response = await fetch('https://api.boostfluence.com/api/instagram-profile-v2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+      body: JSON.stringify({ username })
+    });
+    const d = await response.json();
+    if (!d?.username) throw new Error('Akun tidak ditemukan');
+    const fields = [
+      ['👤 Username', '@' + d.username],
+      ['📛 Nama', d.full_name || '-'],
+      ['✅ Verified', d.is_verified ? 'Ya ✅' : 'Tidak'],
+      ['🔒 Private', d.is_private ? 'Ya 🔒' : 'Tidak'],
+      ['👥 Pengikut', shortNum(d.follower_count)],
+      ['👤 Mengikuti', shortNum(d.following_count)],
+      ['📷 Postingan', shortNum(d.media_count)],
+      ['📝 Bio', d.biography || '-'],
+    ];
+    fields.filter(f=>f[1]!=null).forEach(([l,v]) => {
+      const i = document.createElement('div');
+      i.className = 'stat-item';
+      i.innerHTML = `<div class="stat-item-label">${l}</div><div class="stat-item-val" style="word-break:break-word">${v}</div>`;
+      res.appendChild(i);
+    });
+    const pic = d.profile_pic_url_hd || d.profile_pic_url;
+    if (pic) {
+      const img = document.createElement('div');
+      img.style.cssText = 'grid-column:1/-1;margin-top:8px;text-align:center';
+      img.innerHTML = `<img src="${pic}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--g)">`;
+      res.appendChild(img);
+    }
+    // link IG
+    const link = document.createElement('div');
+    link.style.cssText = 'grid-column:1/-1;margin-top:4px';
+    link.innerHTML = `<a href="https://instagram.com/${d.username}" target="_blank" style="color:var(--g);font-size:.85rem">🔗 instagram.com/${d.username}</a>`;
+    res.appendChild(link);
+  } catch(e) { res.innerHTML = `<div class="stat-item" style="color:var(--c)">❌ ${e.message}</div>`; }
+  setLoading(btn, false);
+}
+
+
+// ═══════════════════════════════════════
+//  TEMP MAIL
+// ═══════════════════════════════════════
+const TM = {
+  email: null, token: null, accountId: null,
+  provider: 0, messages: [],
+  timerSecs: 600, timerInterval: null, autoInterval: null,
+
+  PROVIDERS: [
+    {
+      name: 'mail.tm',
+      async generate() {
+        const domRes = await fetch('https://api.mail.tm/domains');
+        if (!domRes.ok) throw new Error('mail.tm domains failed');
+        const domData = await domRes.json();
+        const domain = domData['hydra:member'][0].domain;
+        const rand = Math.random().toString(36).slice(2,10);
+        const address = `${rand}@${domain}`;
+        const password = Math.random().toString(36).slice(2,12) + 'Zx1!';
+        const regRes = await fetch('https://api.mail.tm/accounts', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ address, password })
+        });
+        const regData = await regRes.json();
+        if (!regRes.ok) throw new Error(regData['hydra:description'] || 'register failed');
+        const tokenRes = await fetch('https://api.mail.tm/token', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ address, password })
+        });
+        if (!tokenRes.ok) throw new Error('token failed');
+        const tokenData = await tokenRes.json();
+        return { address, token: tokenData.token, accountId: regData.id };
+      },
+      async fetchInbox(token) {
+        const res = await fetch('https://api.mail.tm/messages', { headers:{'Authorization':`Bearer ${token}`} });
+        if (!res.ok) throw new Error('inbox failed');
+        return (await res.json())['hydra:member'] || [];
+      },
+      async fetchMessage(token, id) {
+        const res = await fetch(`https://api.mail.tm/messages/${id}`, { headers:{'Authorization':`Bearer ${token}`} });
+        if (!res.ok) throw new Error('message failed');
+        return res.json();
+      },
+      async deleteAccount(token, accountId) {
+        await fetch(`https://api.mail.tm/accounts/${accountId}`, { method:'DELETE', headers:{'Authorization':`Bearer ${token}`} });
+      }
+    },
+    {
+      name: 'guerrillamail',
+      async generate() {
+        const res = await fetch('https://api.guerrillamail.com/ajax.php?f=get_email_address&lang=en&sid_token=');
+        if (!res.ok) throw new Error('guerrillamail failed');
+        const data = await res.json();
+        if (!data.email_addr) throw new Error('no address');
+        return { address: data.email_addr, token: data.sid_token, accountId: data.email_addr };
+      },
+      async fetchInbox(token) {
+        const res = await fetch(`https://api.guerrillamail.com/ajax.php?f=check_email&seq=0&sid_token=${token}`);
+        const data = await res.json();
+        return (data.list||[]).map(m => ({
+          id: String(m.mail_id),
+          from: { address: m.mail_from||'unknown' },
+          subject: m.mail_subject||'',
+          intro: m.mail_excerpt||'',
+          createdAt: new Date(parseInt(m.mail_timestamp)*1000).toISOString(),
+          seen: m.mail_read==='1',
+        }));
+      },
+      async fetchMessage(token, id) {
+        const res = await fetch(`https://api.guerrillamail.com/ajax.php?f=fetch_email&email_id=${id}&sid_token=${token}`);
+        const m = await res.json();
+        const tmp = document.createElement('div'); tmp.innerHTML = m.mail_body||'';
+        return { subject:m.mail_subject||'', from:{address:m.mail_from||'unknown'}, createdAt:new Date(parseInt(m.mail_timestamp)*1000).toISOString(), text: tmp.innerText||'(kosong)' };
+      },
+      async deleteAccount() {}
+    },
+    {
+      name: 'tempmail.lol',
+      async generate() {
+        const res = await fetch('https://api.tempmail.lol/generate');
+        if (!res.ok) throw new Error('tempmail.lol failed');
+        const data = await res.json();
+        if (!data.address) throw new Error('no address');
+        return { address: data.address, token: data.token, accountId: data.address };
+      },
+      async fetchInbox(token) {
+        const res = await fetch(`https://api.tempmail.lol/auth/messages?token=${token}`);
+        const data = await res.json();
+        return (data.email||[]).map((m,i) => ({
+          id: String(i), from:{address:m.sender||'unknown'}, subject:m.subject||'',
+          intro:(m.body||'').slice(0,80), createdAt:m.date||new Date().toISOString(), seen:false,
+          _body: m.body
+        }));
+      },
+      async fetchMessage(token, id) {
+        const msgs = await this.fetchInbox(token);
+        const m = msgs[parseInt(id)] || {};
+        return { subject:m.subject||'', from:m.from, createdAt:m.createdAt, text:m._body||'' };
+      },
+      async deleteAccount() {}
+    }
+  ]
+};
+
+function tmSetStatus(type) {
+  const dot = document.getElementById('tm-dot');
+  const txt = document.getElementById('tm-status');
+  if (!dot) return;
+  if (type==='online') { dot.style.background='var(--e)'; dot.style.boxShadow='0 0 8px var(--e)'; txt.textContent='AKTIF — Auto-refresh tiap 10 detik'; }
+  else if (type==='loading') { dot.style.background='var(--g)'; dot.style.boxShadow='0 0 8px var(--g)'; txt.textContent='Membuat alamat email aman...'; }
+  else { dot.style.background='var(--muted)'; dot.style.boxShadow='none'; txt.textContent='Terputus'; }
+}
+
+function tmUpdateTimer() {
+  const m = Math.floor(TM.timerSecs/60).toString().padStart(2,'0');
+  const s = (TM.timerSecs%60).toString().padStart(2,'0');
+  const el = document.getElementById('tm-timer');
+  if (!el) return;
+  el.textContent = `${m}:${s}`;
+  el.style.color = TM.timerSecs<=60 ? 'var(--c)' : 'var(--e)';
+}
+
+function tmStartTimer(secs=600) {
+  clearInterval(TM.timerInterval);
+  TM.timerSecs = secs;
+  tmUpdateTimer();
+  TM.timerInterval = setInterval(() => {
+    TM.timerSecs--;
+    tmUpdateTimer();
+    if (TM.timerSecs<=0) { clearInterval(TM.timerInterval); tmGenerate(); }
+  }, 1000);
+}
+
+function tmExtend() { TM.timerSecs += 600; tmUpdateTimer(); }
+
+async function tmGenerate() {
+  tmSetStatus('loading');
+  const emailEl = document.getElementById('tm-email');
+  if (emailEl) emailEl.textContent = 'GENERATING...';
+  clearInterval(TM.autoInterval);
+  for (let i=0; i<TM.PROVIDERS.length; i++) {
+    const idx = (TM.provider + i) % TM.PROVIDERS.length;
+    const prov = TM.PROVIDERS[idx];
+    try {
+      const r = await prov.generate();
+      TM.email = r.address; TM.token = r.token; TM.accountId = r.accountId; TM.provider = idx;
+      if (emailEl) emailEl.textContent = TM.email;
+      tmSetStatus('online');
+      tmStartTimer(600);
+      TM.messages = [];
+      tmRenderInbox([]);
+      TM.autoInterval = setInterval(tmFetchInbox, 10000);
+      return;
+    } catch(e) { console.warn(prov.name, e.message); }
+  }
+  if (emailEl) emailEl.textContent = 'SEMUA PROVIDER GAGAL';
+  tmSetStatus('offline');
+}
+
+async function tmFetchInbox() {
+  if (!TM.token) return;
+  try {
+    const prov = TM.PROVIDERS[TM.provider];
+    const msgs = await prov.fetchInbox(TM.token);
+    if (msgs.length !== TM.messages.length) {
+      if (msgs.length > TM.messages.length && TM.messages.length > 0) {
+        const newCount = msgs.length - TM.messages.length;
+        // flash inbox count
+        const cnt = document.getElementById('tm-count');
+        if (cnt) { cnt.style.background='var(--c)'; setTimeout(()=>cnt.style.background='var(--e)',1500); }
+      }
+      TM.messages = msgs;
+      tmRenderInbox(msgs);
+    }
+  } catch(e) { console.warn('inbox error', e.message); }
+}
+
+function tmRenderInbox(msgs) {
+  const list = document.getElementById('tm-inbox');
+  const cnt = document.getElementById('tm-count');
+  if (!list) return;
+  if (cnt) cnt.textContent = msgs.length;
+  if (!msgs.length) {
+    list.innerHTML = `<div style="text-align:center;padding:28px 0;color:var(--muted);">
+      <div style="font-size:2.2rem;margin-bottom:8px">📭</div>
+      <div style="font-size:.85rem;font-weight:700;letter-spacing:.08em">INBOX KOSONG</div>
+      <div style="font-size:.75rem;margin-top:4px;opacity:.7">Menunggu email masuk...</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = msgs.map((m,i) => {
+    const from = m.from?.address || 'unknown';
+    const subj = m.subject || '(Tanpa Judul)';
+    const prev = m.intro || '';
+    const time = new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return `<div onclick="tmOpenEmail('${m.id}')" style="padding:12px;border-radius:10px;margin-bottom:6px;background:${m.seen?'transparent':'rgba(34,211,238,.05)'};border:1px solid ${m.seen?'var(--border)':'var(--e)'};cursor:pointer;transition:all .15s;animation:fadeDown .3s ${i*.05}s both">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <div style="font-size:.75rem;color:var(--e);font-family:'DM Mono',monospace;opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">${from}</div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          ${!m.seen?'<div style="width:6px;height:6px;border-radius:50%;background:var(--e);box-shadow:0 0 6px var(--e)"></div>':''}
+          <div style="font-size:.7rem;color:var(--muted)">${time}</div>
+        </div>
+      </div>
+      <div style="font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:3px">${subj}</div>
+      <div style="font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${prev}</div>
+    </div>`;
+  }).join('');
+}
+
+async function tmOpenEmail(id) {
+  if (!TM.token) return;
+  try {
+    const prov = TM.PROVIDERS[TM.provider];
+    const m = await prov.fetchMessage(TM.token, id);
+    document.getElementById('tm-modal-subject').textContent = m.subject || '(Tanpa Judul)';
+    document.getElementById('tm-modal-from').textContent = `DARI: ${m.from?.address || 'unknown'}`;
+    document.getElementById('tm-modal-date').textContent = new Date(m.createdAt).toLocaleString('id-ID');
+    let body = '';
+    if (m.text) body = m.text;
+    else if (m.html) { const t=document.createElement('div'); t.innerHTML=m.html[0]||m.html; body=t.innerText; }
+    document.getElementById('tm-modal-body').textContent = body || '(Email kosong)';
+    const otpMatch = (body||'').match(/(\d{4,8})/);
+    const otpBox = document.getElementById('tm-otp-box');
+    if (otpMatch) { document.getElementById('tm-otp-code').textContent = otpMatch[1]; otpBox.style.display='block'; }
+    else { otpBox.style.display='none'; }
+    const modal = document.getElementById('tm-modal');
+    modal.style.display='flex';
+    const idx = TM.messages.findIndex(x=>x.id===id);
+    if (idx!==-1) { TM.messages[idx].seen=true; tmRenderInbox(TM.messages); }
+  } catch(e) { alert('Gagal memuat email: '+e.message); }
+}
+
+function tmCloseModal() { document.getElementById('tm-modal').style.display='none'; }
+
+function tmCopyEmail() {
+  if (!TM.email) return;
+  navigator.clipboard.writeText(TM.email).catch(()=>{});
+  const btn = document.getElementById('tm-copy-btn');
+  if (btn) { btn.textContent='COPIED!'; setTimeout(()=>btn.textContent='COPY',1500); }
+}
+
+function tmCopyOTP() {
+  const code = document.getElementById('tm-otp-code').textContent;
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const btn = document.getElementById('tm-otp-copy');
+  if (btn) { btn.textContent='COPIED!'; btn.style.background='var(--f)'; setTimeout(()=>{ btn.textContent='COPY'; btn.style.background='var(--e)'; },2000); }
+}
+
+function tmChange() { clearInterval(TM.autoInterval); tmGenerate(); }
+
+async function tmDelete() {
+  if (!TM.token) return;
+  const btn = document.getElementById('tm-delete-btn');
+  if (btn) btn.textContent = '⏳ MENGHAPUS...';
+  try { await TM.PROVIDERS[TM.provider].deleteAccount(TM.token, TM.accountId); } catch(e) {}
+  clearInterval(TM.timerInterval); clearInterval(TM.autoInterval);
+  TM.email=null; TM.token=null; TM.accountId=null;
+  const el = document.getElementById('tm-email');
+  if (el) el.textContent = '—';
+  document.getElementById('tm-timer').textContent = '00:00';
+  tmRenderInbox([]);
+  tmSetStatus('offline');
+  if (btn) btn.textContent = '🗑️ HAPUS MAIL';
+  setTimeout(tmGenerate, 1000);
+}
+
+async function tmRefresh() {
+  const btn = document.getElementById('tm-refresh-btn');
+  if (btn) { btn.style.transform='rotate(360deg)'; setTimeout(()=>btn.style.transform='',600); }
+  await tmFetchInbox();
+}
+
+// Auto-init saat tab TempMail diklik pertama kali
+let tmInited = false;
+document.querySelectorAll('.tab').forEach(t => {
+  if (t.dataset.view === 'tempmail') {
+    t.addEventListener('click', () => {
+      if (!tmInited) { tmInited = true; tmGenerate(); }
+    });
+  }
+});
+
+// ═══════════════════════════════════════
+//  MULTIPLAYER — Firebase Realtime DB
+// ═══════════════════════════════════════
+
+// Firebase config
+const firebaseConfig = {
+  apiKey:"AIzaSyPLACEHOLDER",
+  authDomain:"perang-game.firebaseapp.com",
+  databaseURL:"https://perang-game-default-rtdb.firebaseio.com",
+  projectId:"perang-game",
+  storageBucket:"perang-game.appspot.com",
+  messagingSenderId:"000000000",
+  appId:"1:000:web:000"
+};
+
+// Load Firebase SDK dinamis
+let _db = null, _ref, _onValue, _set, _update, _push, _remove, _off, _get;
+let mpFirebaseReady = false;
+
+async function mpLoadFirebase() {
+  if (mpFirebaseReady) return true;
+  try {
+    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const db = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+    const app = initializeApp(firebaseConfig);
+    _db = db.getDatabase(app);
+    _ref = db.ref; _onValue = db.onValue; _set = db.set;
+    _update = db.update; _push = db.push; _remove = db.remove;
+    _off = db.off; _get = db.get;
+    mpFirebaseReady = true;
+    return true;
+  } catch(e) {
+    alert('❌ Gagal connect Firebase: ' + e.message);
+    return false;
+  }
+}
+
+// State multiplayer
+const MP = {
+  roomId: null, myId: null, myName: '', isHost: false,
+  gameId: null, rounds: 10, currentRound: 0,
+  currentAnswer: '', hintRevealed: 1, hintUsed: 0,
+  answered: false, timerInterval: null, timeLeft: 60,
+  listeners: [], gameCache: null, usedIndexes: [],
+};
+
+// Games yg support multiplayer (local JSON yg punya qa/bendera/imgqa)
+const MP_GAMES = GAMES.filter(g => g.local && ['qa','bendera','imgqa'].includes(g.type||'qa'));
+
+function mpShowScreen(id) {
+  document.querySelectorAll('.mp-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function mpGenCode() {
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function mpMakeHint(word, revealed) {
+  const w = word.toString();
+  // selalu tampilkan 3 huruf pertama (non-spasi)
+  const shown = new Set();
+  let count = 0;
+  for (let i = 0; i < w.length && count < 3; i++) {
+    if (w[i] !== ' ') { shown.add(i); count++; }
+  }
+  // tambah huruf dari revealed
+  let tries = 0;
+  while (shown.size < Math.min(revealed + 3, w.length) && tries < 200) {
+    const idx = Math.floor(Math.random() * w.length);
+    if (w[idx] !== ' ') shown.add(idx);
+    tries++;
+  }
+  return w.split('').map((c,i) => c === ' ' ? '  ' : (shown.has(i) ? c : '_')).join(' ');
+}
+
+// ── Buat Room ──
+async function mpCreateRoom() {
+  const name = document.getElementById('mp-myname').value.trim();
+  if (!name) { alert('Masukkan nama dulu!'); return; }
+  if (!(await mpLoadFirebase())) return;
+  MP.myName = name;
+  MP.isHost = true;
+  const code = mpGenCode();
+  MP.roomId = code;
+  MP.myId = _push(_ref(_db,'tmp')).key; // generate unique id
+  const roomData = {
+    code, status:'lobby', gameId: MP_GAMES[0].id,
+    rounds:10, hostId: MP.myId,
+    players:{ [MP.myId]: { name, score:0, online:true, answered:false } },
+    createdAt: Date.now()
+  };
+  await _set(_ref(_db, `rooms/${code}`), roomData);
+  mpEnterLobby(code);
+}
+
+// ── Join Room ──
+async function mpJoinRoom() {
+  const name = document.getElementById('mp-myname').value.trim();
+  const code = document.getElementById('mp-joincode').value.trim().toUpperCase();
+  if (!name) { alert('Masukkan nama dulu!'); return; }
+  if (!code || code.length < 4) { alert('Masukkan kode room!'); return; }
+  if (!(await mpLoadFirebase())) return;
+  MP.myName = name;
+  MP.isHost = false;
+  MP.roomId = code;
+  // cek room exist
+  const snap = await _get(_ref(_db, `rooms/${code}`));
+  if (!snap.exists()) { alert('❌ Room tidak ditemukan!'); return; }
+  const room = snap.val();
+  if (room.status === 'playing') { alert('⚠️ Game sudah dimulai!'); return; }
+  MP.myId = _push(_ref(_db,'tmp')).key;
+  await _update(_ref(_db, `rooms/${code}/players/${MP.myId}`), { name, score:0, online:true, answered:false });
+  mpEnterLobby(code);
+}
+
+// ── Masuk Lobby ──
+function mpEnterLobby(code) {
+  mpShowScreen('mp-lobby');
+  document.getElementById('mp-show-code').textContent = code;
+
+  // Isi dropdown game
+  const sel = document.getElementById('mp-game-sel');
+  sel.innerHTML = MP_GAMES.map(g => `<option value="${g.id}">${g.icon} ${g.name}</option>`).join('');
+
+  // Tampilkan/sembunyikan tombol host
+  document.getElementById('mp-host-btn-wrap').style.display = MP.isHost ? 'block' : 'none';
+  document.getElementById('mp-guest-wait').style.display = MP.isHost ? 'none' : 'block';
+  document.getElementById('mp-game-pick-wrap').style.opacity = MP.isHost ? '1' : '0.6';
+
+  // Sync perubahan game & rounds (host only)
+  if (MP.isHost) {
+    sel.onchange = () => _update(_ref(_db, `rooms/${code}`), { gameId: sel.value });
+    document.getElementById('mp-rounds-sel').onchange = (e) => _update(_ref(_db, `rooms/${code}`), { rounds: parseInt(e.target.value) });
+  } else {
+    sel.disabled = true;
+    document.getElementById('mp-rounds-sel').disabled = true;
+  }
+
+  // Listen room
+  const roomRef = _ref(_db, `rooms/${code}`);
+  const unsub = _onValue(roomRef, snap => {
+    if (!snap.exists()) { mpLeaveRoom(); return; }
+    const room = snap.val();
+
+    // Update sel kalau guest
+    if (!MP.isHost && room.gameId) document.getElementById('mp-game-sel').value = room.gameId;
+    if (!MP.isHost && room.rounds) document.getElementById('mp-rounds-sel').value = room.rounds;
+    MP.gameId = room.gameId;
+    MP.rounds = room.rounds || 10;
+
+    // Render player list
+    const players = room.players || {};
+    const count = Object.keys(players).length;
+    document.getElementById('mp-player-count').textContent = count;
+    document.getElementById('mp-player-list').innerHTML = Object.entries(players)
+      .map(([pid, p]) => `
+        <div class="mp-player-card">
+          <span class="mp-player-name">${p.name}${pid === MP.myId ? ' <span class="mp-player-badge mp-badge-you">Kamu</span>' : ''}</span>
+          ${pid === room.hostId ? '<span class="mp-player-badge mp-badge-host">HOST</span>' : '<span class="mp-player-badge mp-badge-ready">Siap</span>'}
+        </div>`).join('');
+    document.getElementById('mp-lobby-status').textContent = `${count} pemain terhubung`;
+
+    // Kalau status berubah jadi 'playing' → mulai game
+    if (room.status === 'playing') {
+      MP.listeners.forEach(u => u()); MP.listeners = [];
+      mpStartPlaying(room);
+    }
+  });
+  MP.listeners.push(() => _off(roomRef));
+
+  // Tandai offline saat keluar
+  window.addEventListener('beforeunload', mpLeaveRoom);
+}
+
+// ── Host mulai game ──
+async function mpStartGame() {
+  const gameId = document.getElementById('mp-game-sel').value;
+  const rounds = parseInt(document.getElementById('mp-rounds-sel').value);
+  // Load cache game dulu
+  const g = MP_GAMES.find(x => x.id === gameId);
+  if (!g) return;
+  if (!g._cache) {
+    try {
+      const r = await fetch(g.path);
+      const json = await r.json();
+      g._cache = Array.isArray(json) ? json : (json.soal || json.data || json.questions || []);
+    } catch(e) { alert('❌ Gagal load soal: ' + e.message); return; }
+  }
+  MP.gameCache = g._cache;
+  MP.usedIndexes = [];
+  // Generate semua soal sekarang (host)
+  const questions = mpPickQuestions(g, rounds);
+  await _update(_ref(_db, `rooms/${MP.roomId}`), {
+    status:'playing', gameId, rounds, questions,
+    currentRound:0, roundStart: Date.now()
+  });
+}
+
+function mpPickQuestions(g, count) {
+  const pool = g._cache;
+  const type = g.type || 'qa';
+  const result = [];
+  const used = new Set();
+  while (result.length < count && result.length < pool.length) {
+    const idx = Math.floor(Math.random() * pool.length);
+    if (used.has(idx)) continue;
+    used.add(idx);
+    const item = pool[idx];
+    let soal='', jawab='', img='';
+    if (type === 'bendera') {
+      soal = '🚩 Negara apakah ini?'; jawab = item.name || item.jawaban || ''; img = item.img || '';
+    } else if (type === 'imgqa') {
+      soal = item.pertanyaan || item.soal || '❓ Gambar apakah ini?';
+      jawab = (item.jawaban||item.answer||item.nama||item.name||'').toString(); img = item.img||item.image||item.foto||'';
+    } else {
+      soal = item.pertanyaan||item.soal||item.question||item.tebakan||'';
+      jawab = (item.jawaban||item.answer||item.kunci||'').toString();
+      if (item.tipe) soal = '['+item.tipe+'] '+soal;
+    }
+    if (soal && jawab) result.push({ soal, jawab, img });
+  }
+  return result;
+}
+
+// ── Mulai bermain (semua player) ──
+function mpStartPlaying(room) {
+  const g = MP_GAMES.find(x => x.id === room.gameId) || MP_GAMES[0];
+  MP.gameId = room.gameId;
+  MP.rounds = room.rounds || 10;
+  MP.currentRound = room.currentRound || 0;
+  mpShowScreen('mp-playing');
+  document.getElementById('mp-game-label').textContent = `${g.icon} ${g.name}`;
+
+  // Listen round changes
+  const roomRef = _ref(_db, `rooms/${MP.roomId}`);
+  const unsub = _onValue(roomRef, snap => {
+    if (!snap.exists()) { mpLeaveRoom(); return; }
+    const data = snap.val();
+    if (data.status === 'finished') {
+      _off(roomRef);
+      mpShowResult(data);
+      return;
+    }
+    // Update skor chips
+    mpRenderScoreChips(data.players || {});
+    // Update siapa yg sudah jawab
+    mpRenderAnswered(data.players || {});
+    // Kalau round baru (host update round)
+    if (data.currentRound !== MP.currentRound || data.roundStart !== MP._lastRoundStart) {
+      MP.currentRound = data.currentRound || 0;
+      MP._lastRoundStart = data.roundStart;
+      const q = (data.questions || [])[MP.currentRound];
+      if (q) mpLoadMPQuestion(q, data);
+    }
+  });
+  MP.listeners.push(() => _off(roomRef));
+
+  // Load soal pertama
+  const q = (room.questions || [])[0];
+  if (q) mpLoadMPQuestion(q, room);
+}
+
+function mpLoadMPQuestion(q, room) {
+  clearInterval(MP.timerInterval);
+  MP.currentAnswer = q.jawab;
+  MP.hintRevealed = 1;
+  MP.hintUsed = 0;
+  MP.answered = false;
+
+  document.getElementById('mp-round-label').textContent = `Soal ${MP.currentRound+1}/${MP.rounds}`;
+  document.getElementById('mp-question').textContent = q.soal;
+  document.getElementById('mp-hint').textContent = mpMakeHint(q.jawab, 1);
+  document.getElementById('mp-inp').value = '';
+  document.getElementById('mp-feedback').style.display = 'none';
+  document.getElementById('mp-hint-count').textContent = '4';
+  document.getElementById('mp-hint-btn').disabled = false;
+  document.getElementById('mp-hint-btn').style.opacity = '1';
+  // reset vote nyerah UI
+  const nyerahBtn = document.getElementById('mp-nyerah-btn');
+  if (nyerahBtn) { nyerahBtn.style.borderColor='var(--border)'; nyerahBtn.style.color='var(--muted)'; nyerahBtn.style.background='rgba(100,100,120,.15)'; }
+  const nyerahCount = document.getElementById('mp-nyerah-count');
+  if (nyerahCount) nyerahCount.textContent = '(0/0)';
+  const voteInfo = document.getElementById('mp-vote-info');
+  if (voteInfo) voteInfo.style.display = 'none';
+
+  // gambar
+  const imgWrap = document.getElementById('mp-img-wrap');
+  if (q.img) {
+    document.getElementById('mp-img').src = q.img;
+    imgWrap.style.display = 'block';
+  } else {
+    imgWrap.style.display = 'none';
+  }
+
+  // Reset answered status + vote nyerah semua player untuk ronde ini
+  if (MP.isHost) {
+    const players = room.players || {};
+    const updates = {};
+    Object.keys(players).forEach(pid => {
+      updates[`rooms/${MP.roomId}/players/${pid}/answered`] = false;
+      updates[`rooms/${MP.roomId}/players/${pid}/voteNyerah`] = false;
+    });
+    _update(_ref(_db), updates);
+  }
+
+  // Timer countdown 60 detik
+  MP.timeLeft = 60;
+  mpUpdateTimerRing(60);
+  MP.timerInterval = setInterval(() => {
+    MP.timeLeft--;
+    mpUpdateTimerRing(MP.timeLeft);
+    if (MP.timeLeft <= 0) {
+      clearInterval(MP.timerInterval);
+      mpTimeUp();
+    }
+  }, 1000);
+}
+
+function mpUpdateTimerRing(t) {
+  document.getElementById('mp-timer-num').textContent = t;
+  const pct = (t / 60 * 100).toFixed(1) + '%';
+  const ring = document.getElementById('mp-timer-ring');
+  ring.style.background = `conic-gradient(${t > 15 ? '#f97316' : '#ff4d6d'} ${pct}, rgba(255,255,255,.07) 0)`;
+  ring.style.boxShadow = t <= 10 ? '0 0 14px rgba(255,77,109,.5)' : 'none';
+}
+
+function mpCheckAnswer() {
+  if (MP.answered || !MP.currentAnswer) return;
+  const inp = document.getElementById('mp-inp');
+  const raw = inp.value.trim();
+  if (!raw) return;
+  inp.value = '';
+  const guess = raw.toLowerCase();
+  const correct = MP.currentAnswer.toLowerCase();
+  if (guess === correct || correct.includes(guess) || guess.includes(correct)) {
+    MP.answered = true;
+    clearInterval(MP.timerInterval);
+    // Hitung skor berdasarkan waktu tersisa (max 100, min 10)
+    const pts = Math.max(10, Math.min(100, MP.timeLeft * 1.5 | 0));
+    // Update skor di Firebase
+    _get(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}/score`)).then(snap => {
+      const cur = snap.val() || 0;
+      _update(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`), {
+        score: cur + pts, answered: true
+      });
+    });
+    mpShowMPFeedback(`🎉 BETUL! +${pts} poin`, true);
+    document.getElementById('mp-hint').textContent = MP.currentAnswer.split('').join(' ');
+    // Host periksa apakah semua sudah jawab
+    if (MP.isHost) setTimeout(() => mpCheckAllAnswered(), 800);
+  } else {
+    mpShowMPFeedback('❌ Salah! Coba lagi...', false);
+  }
+}
+
+function mpAddHint() {
+  if (MP.answered || !MP.currentAnswer) return;
+  const MAX_HINT = 4;
+  if (MP.hintUsed >= MAX_HINT) return;
+  const ansLen = MP.currentAnswer.replace(/ /g,'').length;
+  MP.hintUsed++;
+  const remaining = MAX_HINT - MP.hintUsed;
+
+  // Kurangi skor player SENDIRI saja di Firebase (tidak pengaruhi player lain)
+  _get(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}/score`)).then(snap => {
+    const cur = snap.val() || 0;
+    _update(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`), {
+      score: Math.max(0, cur - 2)
+    });
+  });
+
+  if (ansLen <= 4) {
+    // jawaban pendek → buka semua, skor jadi 0
+    document.getElementById('mp-hint').textContent = MP.currentAnswer.split('').join(' ');
+    document.getElementById('mp-hint-btn').disabled = true;
+    document.getElementById('mp-hint-btn').style.opacity = '.4';
+    document.getElementById('mp-hint-count').textContent = '0';
+    _update(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`), { score: 0 });
+    mpShowMPFeedback('⚠️ Jawaban pendek, semua terbuka! Skor jadi 0', false);
+    return;
+  }
+
+  MP.hintRevealed = Math.min(MP.hintRevealed + 1, MP.currentAnswer.length);
+  document.getElementById('mp-hint').textContent = mpMakeHint(MP.currentAnswer, MP.hintRevealed);
+  document.getElementById('mp-hint-count').textContent = remaining;
+  mpShowMPFeedback(`💡 Hint dibuka! -2 skor kamu`, false);
+
+  if (remaining === 0) {
+    document.getElementById('mp-hint-btn').disabled = true;
+    document.getElementById('mp-hint-btn').style.opacity = '.4';
+  }
+}
+
+async function mpVoteNyerah() {
+  // Toggle vote nyerah player ini
+  const snap = await _get(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}/voteNyerah`));
+  const already = snap.val() || false;
+  await _update(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`), { voteNyerah: !already });
+  mpShowMPFeedback(already ? '↩️ Vote nyerah dibatalkan' : '🏳 Kamu vote nyerah!', false);
+}
+
+function mpHandleNyerahVotes(players) {
+  const total = Object.keys(players).length;
+  const votes = Object.values(players).filter(p => p.voteNyerah && !p.answered).length;
+  const needed = Math.ceil(total / 2); // mayoritas: lebih dari setengah
+  const myVote = players[MP.myId]?.voteNyerah || false;
+
+  // Update tombol
+  const btn = document.getElementById('mp-nyerah-btn');
+  const countEl = document.getElementById('mp-nyerah-count');
+  if (btn && countEl) {
+    countEl.textContent = `(${votes}/${needed})`;
+    btn.style.borderColor = myVote ? '#f97316' : 'var(--border)';
+    btn.style.color = myVote ? '#f97316' : 'var(--muted)';
+    btn.style.background = myVote ? 'rgba(249,115,22,.12)' : 'rgba(100,100,120,.15)';
+  }
+
+  // Info vote
+  const voteInfo = document.getElementById('mp-vote-info');
+  if (votes > 0 && voteInfo) {
+    voteInfo.style.display = 'block';
+    const voters = Object.values(players).filter(p => p.voteNyerah && !p.answered).map(p => p.name);
+    voteInfo.textContent = `🏳 ${voters.join(', ')} mau nyerah — butuh ${needed} vote (${votes}/${needed})`;
+  } else if (voteInfo) {
+    voteInfo.style.display = 'none';
+  }
+
+  // Kalau mayoritas vote nyerah → skip soal (hanya host yang eksekusi)
+  if (MP.isHost && votes >= needed && total > 0) {
+    // Reset semua vote nyerah dulu
+    const updates = {};
+    Object.keys(players).forEach(pid => { updates[`rooms/${MP.roomId}/players/${pid}/voteNyerah`] = false; });
+    _update(_ref(_db), updates).then(() => mpCheckAllAnswered());
+  }
+}
+
+function mpTimeUp() {
+  if (!MP.answered) {
+    MP.answered = true;
+    _update(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`), { answered: true });
+    document.getElementById('mp-hint').textContent = MP.currentAnswer.split('').join(' ');
+    mpShowMPFeedback('⏰ Waktu habis! Jawaban: ' + MP.currentAnswer, false);
+  }
+  if (MP.isHost) setTimeout(() => mpCheckAllAnswered(), 500);
+}
+
+async function mpCheckAllAnswered() {
+  const snap = await _get(_ref(_db, `rooms/${MP.roomId}/players`));
+  const players = snap.val() || {};
+  const all = Object.values(players).every(p => p.answered);
+  if (all) {
+    const nextRound = MP.currentRound + 1;
+    if (nextRound >= MP.rounds) {
+      // Selesai!
+      await _update(_ref(_db, `rooms/${MP.roomId}`), { status:'finished' });
+    } else {
+      await _update(_ref(_db, `rooms/${MP.roomId}`), { currentRound: nextRound, roundStart: Date.now() });
+    }
+  }
+}
+
+function mpShowMPFeedback(msg, ok) {
+  const fb = document.getElementById('mp-feedback');
+  fb.style.display = 'block';
+  fb.style.background = ok ? 'rgba(74,222,128,.12)' : 'rgba(255,77,109,.12)';
+  fb.style.border = `1px solid ${ok ? 'var(--f)' : 'var(--c)'}`;
+  fb.style.color = ok ? 'var(--f)' : 'var(--c)';
+  fb.textContent = msg;
+}
+
+function mpRenderScoreChips(players) {
+  const row = document.getElementById('mp-scores-row');
+  row.innerHTML = Object.entries(players)
+    .sort((a,b) => (b[1].score||0)-(a[1].score||0))
+    .map(([pid, p]) => `
+      <div class="mp-score-chip${pid===MP.myId?' me':''}">
+        <div class="mp-score-chip-name">${pid===MP.myId?'⭐ ':''  }${p.name}</div>
+        <div class="mp-score-chip-val">${p.score||0}</div>
+      </div>`).join('');
+}
+
+function mpRenderAnswered(players) {
+  const el = document.getElementById('mp-answered-list');
+  const answered = Object.values(players).filter(p => p.answered).map(p => p.name);
+  const total = Object.keys(players).length;
+  el.innerHTML = answered.length
+    ? `✅ Sudah jawab: ${answered.map(n=>`<b style="color:var(--f)">${n}</b>`).join(', ')} (${answered.length}/${total})`
+    : '';
+  // Handle voting nyerah
+  mpHandleNyerahVotes(players);
+}
+
+function mpShowResult(room) {
+  clearInterval(MP.timerInterval);
+  mpShowScreen('mp-result');
+  const players = Object.entries(room.players || {})
+    .map(([pid,p]) => ({...p, pid}))
+    .sort((a,b) => (b.score||0)-(a.score||0));
+
+  // Podium (top 3)
+  const podium = document.getElementById('mp-podium');
+  const podiumOrder = [1, 0, 2]; // tampilan: 2nd, 1st, 3rd
+  const medals = ['🥇','🥈','🥉'];
+  const heights = [100, 140, 70];
+  const colors = ['#f97316','#facc15','#a855f7'];
+  podium.innerHTML = podiumOrder.map(i => {
+    const p = players[i];
+    if (!p) return '';
+    return `<div class="mp-podium-col">
+      <div class="mp-podium-bar" style="height:${heights[i]}px;background:rgba(${i===0?'249,115,22':i===1?'250,204,21':'168,85,247'},.15);border:2px solid ${colors[i]}">${medals[i]}</div>
+      <div class="mp-podium-name" style="color:${p.pid===MP.myId?'var(--a)':'var(--text)'}">${p.name}</div>
+      <div class="mp-podium-score">${p.score||0}</div>
+    </div>`;
+  }).join('');
+
+  // Full list
+  document.getElementById('mp-final-list').innerHTML = players.map((p,i) => `
+    <div class="mp-player-card" style="${p.pid===MP.myId?'border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.05)':''}">
+      <span style="font-size:1.1rem;margin-right:8px">${medals[i]||'🎮'}</span>
+      <span class="mp-player-name" style="flex:1">${p.name}${p.pid===MP.myId?' <span class="mp-player-badge mp-badge-you">Kamu</span>':''}</span>
+      <span class="mp-player-score">${p.score||0} pts</span>
+    </div>`).join('');
+}
+
+async function mpPlayAgain() {
+  if (!MP.isHost) { mpShowScreen('mp-lobby'); return; }
+  // Reset semua skor
+  const snap = await _get(_ref(_db, `rooms/${MP.roomId}/players`));
+  const players = snap.val() || {};
+  const updates = {};
+  Object.keys(players).forEach(pid => {
+    updates[`rooms/${MP.roomId}/players/${pid}/score`] = 0;
+    updates[`rooms/${MP.roomId}/players/${pid}/answered`] = false;
+  });
+  updates[`rooms/${MP.roomId}/status`] = 'lobby';
+  updates[`rooms/${MP.roomId}/currentRound`] = 0;
+  await _update(_ref(_db), updates);
+  MP.listeners.forEach(u => u()); MP.listeners = [];
+  mpShowScreen('mp-lobby');
+  // Re-enter lobby
+  mpEnterLobby(MP.roomId);
+}
+
+async function mpLeaveRoom() {
+  clearInterval(MP.timerInterval);
+  MP.listeners.forEach(u => { try { u(); } catch(e){} }); MP.listeners = [];
+  if (MP.roomId && MP.myId && _db) {
+    try {
+      await _remove(_ref(_db, `rooms/${MP.roomId}/players/${MP.myId}`));
+      // Kalau host keluar dan masih ada player, pindahkan host (tidak diimplementasi di sini)
+    } catch(e) {}
+  }
+  MP.roomId = null; MP.myId = null; MP.isHost = false;
+  mpShowScreen('mp-home');
+}
+
+</script>
+
+<!-- ════════════════════════════════ GALERI ════════════════════════════════ -->
+<!--
+  TAB GALERI — Penjelasan untuk kamu:
+  ─────────────────────────────────────────────────────────────────────
+  • Taruh file JSON kamu di folder:  api/picture/
+  • Nama file:  pic1.json, pic2.json, ... sampai pic26.json
+  • Isi file JSON bisa salah satu dari format ini:
+      Format A (array URL string):   ["https://...", "https://...", ...]
+      Format B (array object):       [{"url":"https://..."}, ...]
+      Format C (object dengan key):  {"data": [...]} atau {"images": [...]}
+  • Judul dropdown bisa kamu ganti di array GAL_FILES di bawah
+  ─────────────────────────────────────────────────────────────────────
+-->
+<div class="view" id="view-gallery" style="--panel-color:#ec4899">
+  <div class="sec-title" style="--sec-color:#ec4899">🖼️ Galeri</div>
+  <div class="panel" style="--panel-color:#ec4899">
+
+    <!-- Dropdown pilih file JSON -->
+    <div style="margin-bottom:10px">
+      <div style="font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ec4899;margin-bottom:6px">📂 Pilih Koleksi</div>
+      <select class="gal-select-styled" id="gal-select" onchange="galLoadFile()">
+        <!-- Diisi otomatis oleh JS dari array GAL_FILES -->
+      </select>
+    </div>
+
+    <!-- Info bar: nama file + counter -->
+    <div class="gal-info-bar" style="margin-bottom:10px">
+      <span id="gal-filename" style="color:var(--muted);font-size:.72rem">Belum ada yang dipilih</span>
+      <span class="gal-counter" id="gal-counter">0 foto</span>
+    </div>
+
+    <!-- Area gambar -->
+    <div class="gal-img-wrap" id="gal-img-wrap">
+      <div class="gal-img-placeholder" id="gal-placeholder">
+        <div>🖼️</div>
+        <div style="font-weight:700;margin-bottom:4px">Pilih koleksi dulu</div>
+        <div style="font-size:.8rem">Lalu tap "Random" untuk lihat gambar</div>
+      </div>
+      <img id="gal-img" style="display:none" alt="galeri" referrerpolicy="no-referrer">
+      <div id="gal-spinner" style="display:none;padding:40px 0"><div class="gal-loading-spinner"></div></div>
+    </div>
+
+    <!-- URL gambar (kecil, bisa dikopi) -->
+    <div id="gal-url-bar" style="display:none;margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);word-break:break-all;cursor:pointer" onclick="galCopyUrl()" title="Tap untuk copy URL"></div>
+
+    <!-- Tombol aksi -->
+    <div class="gal-btn-row" style="margin-top:12px">
+      <button class="btn btn-primary" style="--panel-color:#ec4899" onclick="galRandom()">🎲 Random</button>
+      <button class="btn btn-ghost btn-sm" id="gal-dl-btn" style="display:none" onclick="galDownload()">⬇ Download</button>
+    </div>
+
+    <!-- Feedback copy/error -->
+    <div id="gal-feedback" style="display:none;margin-top:8px;text-align:center;font-size:.78rem;font-weight:700;padding:8px;border-radius:8px"></div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  GALERI
+//  ─────────────────────────────────────
+//  Ganti nama label di array GAL_FILES sesuai keinginan kamu
+//  Misal: { file:'pic1.json', label:'Pose Keren Vol.1' }
+//  File JSON harus ada di folder: api/picture/
+// ═══════════════════════════════════════
+
+const GAL_FILES = [
+  // Ganti label sesuai keinginan kamu!
+  { file:'pic1.json',  label:'Koleksi 1' },
+  { file:'pic2.json',  label:'Koleksi 2' },
+  { file:'pic3.json',  label:'Koleksi 3' },
+  { file:'pic4.json',  label:'Koleksi 4' },
+  { file:'pic5.json',  label:'Koleksi 5' },
+  { file:'pic6.json',  label:'Koleksi 6' },
+  { file:'pic7.json',  label:'Koleksi 7' },
+  { file:'pic8.json',  label:'Koleksi 8' },
+  { file:'pic9.json',  label:'Koleksi 9' },
+  { file:'pic10.json', label:'Koleksi 10' },
+  { file:'pic11.json', label:'Koleksi 11' },
+  { file:'pic12.json', label:'Koleksi 12' },
+  { file:'pic13.json', label:'Koleksi 13' },
+  { file:'pic14.json', label:'Koleksi 14' },
+  { file:'pic15.json', label:'Koleksi 15' },
+  { file:'pic16.json', label:'Koleksi 16' },
+  { file:'pic17.json', label:'Koleksi 17' },
+  { file:'pic18.json', label:'Koleksi 18' },
+  { file:'pic19.json', label:'Koleksi 19' },
+  { file:'pic20.json', label:'Koleksi 20' },
+  { file:'pic21.json', label:'Koleksi 21' },
+  { file:'pic22.json', label:'Koleksi 22' },
+  { file:'pic23.json', label:'Koleksi 23' },
+  { file:'pic24.json', label:'Koleksi 24' },
+  { file:'pic25.json', label:'Koleksi 25' },
+  { file:'pic26.json', label:'Koleksi 26' },
+];
+
+const GAL = {
+  cache: {},      // cache per file agar tidak fetch ulang
+  pool: [],       // array URL yang sedang aktif
+  currentUrl: '', // URL gambar yang sedang tampil
+  currentFile: '',
+};
+
+// Build dropdown saat load
+(function galBuildSelect() {
+  const sel = document.getElementById('gal-select');
+  GAL_FILES.forEach((g, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${g.label} (${g.file})`;
+    sel.appendChild(opt);
+  });
+})();
+
+// Load file JSON saat dropdown berubah
+async function galLoadFile() {
+  const idx = parseInt(document.getElementById('gal-select').value);
+  const entry = GAL_FILES[idx];
+  if (!entry) return;
+
+  // Tampilkan loading
+  galShowState('loading');
+  document.getElementById('gal-filename').textContent = entry.file;
+  document.getElementById('gal-counter').textContent = '...';
+  document.getElementById('gal-dl-btn').style.display = 'none';
+  document.getElementById('gal-url-bar').style.display = 'none';
+
+  // Pakai cache kalau sudah pernah di-fetch
+  if (GAL.cache[entry.file]) {
+    GAL.pool = GAL.cache[entry.file];
+    GAL.currentFile = entry.file;
+    document.getElementById('gal-counter').textContent = GAL.pool.length + ' foto';
+    galShowState('placeholder');
+    return;
+  }
+
+  try {
+    // Fetch dari folder api/picture/
+    const r = await fetch(`./api/picture/${entry.file}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const json = await r.json();
+
+    // Normalisasi berbagai format JSON → array URL string
+    let urls = [];
+    if (Array.isArray(json)) {
+      urls = json.map(item => typeof item === 'string' ? item : (item.url || item.img || item.image || '')).filter(Boolean);
+    } else {
+      // Format object dengan key data/images/urls
+      const arr = json.data || json.images || json.urls || json.items || Object.values(json)[0] || [];
+      if (Array.isArray(arr)) {
+        urls = arr.map(item => typeof item === 'string' ? item : (item.url || item.img || item.image || '')).filter(Boolean);
+      }
+    }
+
+    if (!urls.length) throw new Error('Tidak ada URL gambar di file ini');
+
+    GAL.cache[entry.file] = urls;
+    GAL.pool = urls;
+    GAL.currentFile = entry.file;
+    document.getElementById('gal-counter').textContent = urls.length + ' foto';
+    galShowState('placeholder');
+
+  } catch(e) {
+    document.getElementById('gal-counter').textContent = '0 foto';
+    galShowFeedback('❌ Gagal load: ' + e.message, false);
+    galShowState('placeholder');
+  }
+}
+
+// Tampilkan gambar random dari pool
+function galRandom(retryCount = 0) {
+  if (!GAL.pool.length) {
+    galShowFeedback('⚠️ Pilih koleksi dulu!', false);
+    return;
+  }
+  const url = GAL.pool[Math.floor(Math.random() * GAL.pool.length)];
+  GAL.currentUrl = url;
+
+  galShowState('loading');
+  document.getElementById('gal-url-bar').style.display = 'none';
+  document.getElementById('gal-dl-btn').style.display = 'none';
+
+  const img = document.getElementById('gal-img');
+  // Penting: referrerpolicy no-referrer biar Discord/CDN tidak blokir
+  img.referrerPolicy = 'no-referrer';
+  img.crossOrigin = null; // jangan set crossorigin, biar tidak trigger CORS preflight
+  img.onload = () => {
+    galShowState('image');
+    document.getElementById('gal-url-bar').style.display = 'block';
+    document.getElementById('gal-url-bar').textContent = '🔗 ' + url;
+    document.getElementById('gal-dl-btn').style.display = '';
+  };
+  img.onerror = () => {
+    // Auto-retry max 3x dengan URL berbeda
+    if (retryCount < 3) {
+      galRandom(retryCount + 1);
+    } else {
+      galShowState('placeholder');
+      galShowFeedback('❌ Gambar gagal dimuat setelah 3x coba.', false);
+    }
+  };
+  // Reset src dulu biar onload/onerror terpanggil ulang
+  img.src = '';
+  img.src = url;
+}
+
+// Download gambar saat ini
+async function galDownload() {
+  if (!GAL.currentUrl) return;
+  try {
+    // Coba fetch → blob → download (bypass CORS kalau gagal buka langsung)
+    const a = document.createElement('a');
+    a.href = GAL.currentUrl;
+    a.download = 'galeri-' + Date.now() + '.jpg';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    galShowFeedback('⬇️ Membuka link download...', true);
+  } catch(e) {
+    galShowFeedback('❌ Gagal download: ' + e.message, false);
+  }
+}
+
+// Copy URL ke clipboard
+async function galCopyUrl() {
+  if (!GAL.currentUrl) return;
+  try {
+    await navigator.clipboard.writeText(GAL.currentUrl);
+    galShowFeedback('✅ URL dicopy!', true);
+  } catch(e) {
+    galShowFeedback('⚠️ Tidak bisa copy otomatis', false);
+  }
+}
+
+// State manager tampilan
+function galShowState(state) {
+  const ph = document.getElementById('gal-placeholder');
+  const img = document.getElementById('gal-img');
+  const sp = document.getElementById('gal-spinner');
+  ph.style.display = 'none';
+  img.style.display = 'none';
+  sp.style.display = 'none';
+  if (state === 'placeholder') ph.style.display = 'block';
+  else if (state === 'image') img.style.display = 'block';
+  else if (state === 'loading') sp.style.display = 'block';
+}
+
+function galShowFeedback(msg, ok) {
+  const fb = document.getElementById('gal-feedback');
+  fb.style.display = 'block';
+  fb.style.background = ok ? 'rgba(74,222,128,.12)' : 'rgba(255,77,109,.12)';
+  fb.style.border = `1px solid ${ok ? 'var(--f)' : 'var(--c)'}`;
+  fb.style.color = ok ? 'var(--f)' : 'var(--c)';
+  fb.textContent = msg;
+  setTimeout(() => fb.style.display = 'none', 2500);
+}
+</script>
+</body>
+</html>
