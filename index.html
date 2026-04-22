@@ -2540,6 +2540,7 @@ async function doAIA(btn) {
   setLoading(btn, true);
   res.className='result show neutral'; res.textContent='🧠 AI sedang menganalisa gambar...';
   try {
+    // Konversi ke base64
     const reader = new FileReader();
     const base64 = await new Promise((resolve, reject) => {
       reader.onload = e => resolve(e.target.result.split(',')[1]);
@@ -2547,21 +2548,28 @@ async function doAIA(btn) {
       reader.readAsDataURL(file);
     });
     const mediaType = file.type || 'image/jpeg';
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    // Groq vision — llama-4-scout-17b, gratis, support image
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: [
-          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-          { type: 'text', text: prompt }
-        ]}]
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64}` } },
+            { type: 'text', text: prompt }
+          ]
+        }]
       })
     });
     const data = await r.json();
     if (data.error) throw new Error(data.error.message);
-    const answer = data.content?.[0]?.text || 'Tidak ada respons.';
+    const answer = data.choices?.[0]?.message?.content || 'Tidak ada respons.';
     res.className='result show neutral'; res.textContent='🧠 ' + answer;
   } catch(e) { res.className='result show err'; res.textContent='❌ '+e.message; }
   setLoading(btn, false);
@@ -2609,43 +2617,125 @@ function bgrPreview(input) {
 
 async function doBGR(btn) {
   const file = document.getElementById('bgr-file').files[0];
-  const err = document.getElementById('bgr-err');
+  const err  = document.getElementById('bgr-err');
   if (!file) { err.className='result show err'; err.textContent='❌ Pilih gambar dulu!'; return; }
   setLoading(btn, true);
   err.className=''; err.textContent='';
   document.getElementById('bgr-res-wrap').style.display='none';
-  try {
-    const fd = new FormData();
-    fd.append('image_file', file);
-    fd.append('size', 'auto');
-    const r = await fetch('https://api.remove.bg/v1.0/removebg', {
-      method: 'POST',
-      headers: { 'X-Api-Key': 'bLFJGwZ2T7sBzPVJ5a7HQkHD' },
-      body: fd
-    });
-    if (!r.ok) {
-      // Fallback: pakai remove.bg gratis tanpa API key via photroom
-      const fd2 = new FormData();
-      fd2.append('image_file', file);
-      const r2 = await fetch('https://sdk.photoroom.com/v1/segment', {
-        method: 'POST',
-        headers: { 'x-api-key': 'sandbox_42cf2d31a87b7d9b2714d79c45e01d44e2cbdde4' },
-        body: fd2
-      });
-      if (!r2.ok) throw new Error('Gagal menghapus background. Coba gambar lain.');
-      const blob2 = await r2.blob();
-      const url2 = URL.createObjectURL(blob2);
-      document.getElementById('bgr-result').src = url2;
-      document.getElementById('bgr-dl').href = url2;
-      document.getElementById('bgr-res-wrap').style.display='block';
-      setLoading(btn, false); return;
-    }
-    const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
+
+  const showResult = (url) => {
     document.getElementById('bgr-result').src = url;
-    document.getElementById('bgr-dl').href = url;
-    document.getElementById('bgr-res-wrap').style.display='block';
-  } catch(e) { err.className='result show err'; err.textContent='❌ '+e.message; }
+    document.getElementById('bgr-dl').href    = url;
+    document.getElementById('bgr-res-wrap').style.display = 'block';
+  };
+
+  // Konversi ke base64 data URL
+  const toDataURL = (f) => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  });
+
+  try {
+    const dataURL = await toDataURL(file);
+    const b64     = dataURL.split(',')[1];
+    const mime    = file.type || 'image/jpeg';
+    let worked    = false;
+
+    // ── API 1: Hugging Face Spaces - rembg (CORS ok, gratis) ──
+    // Format baru Gradio v4
+    if (!worked) {
+      try {
+        const r = await fetch('https://not-lain-background-removal.hf.space/run/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: [dataURL] })
+        });
+        if (r.ok) {
+          const json = await r.json();
+          const out  = json?.data?.[0];
+          if (out && typeof out === 'string' && out.startsWith('data:')) {
+            showResult(out); worked = true;
+          }
+        }
+      } catch(e) { console.warn('hf rembg v1:', e.message); }
+    }
+
+    // ── API 2: HF Spaces - BRIA RMBG (format berbeda) ──
+    if (!worked) {
+      try {
+        const r = await fetch('https://briaai-rmbg-1.4.hf.space/run/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: [{ path: dataURL, orig_name: file.name, size_bytes: file.size }] })
+        });
+        if (r.ok) {
+          const json = await r.json();
+          const out  = json?.data?.[0];
+          const url  = out?.url || (typeof out === 'string' ? out : '');
+          if (url) { showResult(url); worked = true; }
+        }
+      } catch(e) { console.warn('hf bria:', e.message); }
+    }
+
+    // ── API 3: remove.bg (API key, CORS kadang ok dari vercel) ──
+    if (!worked) {
+      try {
+        const fd = new FormData();
+        fd.append('image_file', file);
+        fd.append('size', 'auto');
+        const r = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: { 'X-Api-Key': 'bLFJGwZ2T7sBzPVJ5a7HQkHD' },
+          body: fd
+        });
+        if (r.ok) {
+          const blob = await r.blob();
+          showResult(URL.createObjectURL(blob)); worked = true;
+        }
+      } catch(e) { console.warn('remove.bg:', e.message); }
+    }
+
+    // ── API 4: Clipdrop (support CORS) ──
+    if (!worked) {
+      try {
+        const fd = new FormData();
+        fd.append('image_file', file, file.name);
+        const r = await fetch('https://clipdrop-api.co/remove-background/v1', {
+          method: 'POST',
+          headers: { 'x-api-key': '8ca0af8f714dd8f56db38af2630f99c90de8193a7c32d1ef17e32e8b60726b02cf3ce19b7a81d8c0a3b59440d4b13c5a3' },
+          body: fd
+        });
+        if (r.ok) {
+          const blob = await r.blob();
+          showResult(URL.createObjectURL(blob)); worked = true;
+        }
+      } catch(e) { console.warn('clipdrop:', e.message); }
+    }
+
+    // ── API 5: Photoroom sandbox ──
+    if (!worked) {
+      try {
+        const fd = new FormData();
+        fd.append('image_file', file);
+        const r = await fetch('https://sdk.photoroom.com/v1/segment', {
+          method: 'POST',
+          headers: { 'x-api-key': 'sandbox_42cf2d31a87b7d9b2714d79c45e01d44e2cbdde4' },
+          body: fd
+        });
+        if (r.ok) {
+          const blob = await r.blob();
+          showResult(URL.createObjectURL(blob)); worked = true;
+        }
+      } catch(e) { console.warn('photoroom:', e.message); }
+    }
+
+    if (!worked) throw new Error('Semua API tidak tersedia. Deploy dulu ke Vercel/GitHub Pages bukan buka file lokal.');
+
+  } catch(e) {
+    err.className='result show err'; err.textContent='❌ ' + e.message;
+  }
   setLoading(btn, false);
 }
 
@@ -2690,13 +2780,12 @@ function risPreview(input) {
 
 async function risSearch(engine) {
   const file = document.getElementById('ris-file').files[0];
-  const res = document.getElementById('ris-res');
+  const res  = document.getElementById('ris-res');
   if (!file) { res.className='result show err'; res.textContent='❌ Pilih gambar dulu!'; return; }
 
-  res.className='result show neutral'; res.textContent='⏳ Mengupload gambar...';
+  res.className='result show neutral'; res.textContent='⏳ Mengupload gambar sementara...';
 
   try {
-    // Upload ke imgbb dulu buat dapat URL publik
     const reader = new FileReader();
     const base64 = await new Promise((resolve, reject) => {
       reader.onload = e => resolve(e.target.result.split(',')[1]);
@@ -2704,17 +2793,19 @@ async function risSearch(engine) {
       reader.readAsDataURL(file);
     });
 
+    // Upload ke imgbb dengan expiration 60 detik (auto hapus dari server)
     const fd = new FormData();
     fd.append('image', base64);
-    fd.append('key', '39acf7bdd9ce9baa59a4b37ef96ea0ea');
-    const uploadRes = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
+    fd.append('key', '3742ae6c9c0dee98f40d1135d6ad3ff3');
+    fd.append('expiration', '60'); // auto hapus 60 detik
+    const uploadRes  = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
     const uploadData = await uploadRes.json();
 
     if (!uploadData.success) throw new Error('Gagal upload gambar');
-    const imgUrl = uploadData.data.url;
+    const imgUrl    = uploadData.data.url;
+    const deleteUrl = uploadData.data.delete_url || '';
 
-    let searchUrl = '';
-    let engineName = '';
+    let searchUrl = '', engineName = '';
     if (engine === 'google') {
       searchUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(imgUrl)}`;
       engineName = 'Google Lens';
@@ -2730,8 +2821,18 @@ async function risSearch(engine) {
     }
 
     res.className='result show neutral';
-    res.innerHTML = `✅ Gambar diupload! Membuka ${engineName}...\n<a href="${searchUrl}" target="_blank" style="color:#f5a623;font-weight:700">🔗 Klik di sini jika tidak terbuka otomatis</a>`;
+    res.innerHTML = `✅ Membuka ${engineName}...<br><span id="ris-del-note" style="font-size:.7rem;opacity:.7">🗑 Gambar otomatis terhapus dalam 60 detik</span><br><a href="${searchUrl}" target="_blank" style="color:#f5a623;font-weight:700;display:block;margin-top:6px">🔗 Klik jika tidak terbuka otomatis</a>`;
     window.open(searchUrl, '_blank');
+
+    // Auto delete setelah 10 detik (beri waktu search engine load URL-nya)
+    if (deleteUrl) {
+      setTimeout(async () => {
+        try { await fetch(deleteUrl, { mode: 'no-cors' }); } catch(e) {}
+        const note = document.getElementById('ris-del-note');
+        if (note) note.textContent = '✅ Gambar sudah dihapus dari server';
+      }, 10000);
+    }
+
   } catch(e) { res.className='result show err'; res.textContent='❌ '+e.message; }
 }
 
